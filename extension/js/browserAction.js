@@ -21981,18 +21981,27 @@ var background = chrome.extension.getBackgroundPage();
 var Steps = React.createClass({
   displayName: "Steps",
 
+  onKeydown: function onKeydown(e) {},
+
   render: function render() {
 
     return React.createElement(
       "div",
       { className: "steps" },
-      React.createElement("input", { className: "step-input" }),
+      React.createElement(
+        "h2",
+        null,
+        " What are the steps to get this done today "
+      ),
+      React.createElement("input", { className: "step-input", placeolder: "Add a Step", onKeydown: onKeydown }),
       React.createElement("ul", null)
     );
   }
 });
 
 module.exports = Steps;
+
+// if enter, add an li with the input val
 
 
 },{"react/addons":2}],178:[function(require,module,exports){
@@ -22010,9 +22019,19 @@ var Task = React.createClass({
     return React.createElement(
       "div",
       { className: "task-choice" },
+      React.createElement(
+        "h2",
+        null,
+        "What is the most important thing to get done today"
+      ),
       React.createElement("select", { className: "lists" }),
       React.createElement("select", { className: "tasks" }),
-      React.createElement("input", { className: "task" })
+      React.createElement(
+        "div",
+        { className: "divider" },
+        " or "
+      ),
+      React.createElement("input", { className: "task", placeholder: "Create a task" })
     );
   }
 });
@@ -22032,7 +22051,16 @@ var Time = React.createClass({
 
   render: function render() {
 
-    return React.createElement("input", { type: "time", className: "due-date" });
+    return React.createElement(
+      "div",
+      { "class": "time" },
+      React.createElement(
+        "h2",
+        null,
+        " By when does it need to be completed? "
+      ),
+      React.createElement("input", { type: "time", className: "due-date" })
+    );
   }
 });
 
