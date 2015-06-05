@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/octatone/notifier-for-reddit.git"
+    "url": "https://github.com/octatone/MIT.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/octatone/notifier-for-reddit/issues"
+    "url": "https://github.com/octatone/MIT/issues"
   },
-  "homepage": "https://github.com/octatone/notifier-for-reddit",
+  "homepage": "https://github.com/octatone/MIT",
   "dependencies": {
     "babelify": "^5.0.4",
     "classnames": "^1.2.0",
