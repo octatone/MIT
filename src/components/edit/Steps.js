@@ -15,8 +15,8 @@ var Steps = React.createClass({
   'render': function () {
 
     return (
-      <div className="steps">
-        <h2> What are the steps to get this done today </h2>
+      <div className="steps p2 center container">
+        <h4 className="bold inline-block m0 mb1">What are the steps to get this done today? </h4>
 
         <input className="step-input" placeolder="Add a Step" onKeydown={onKeydown} />
         <ul>

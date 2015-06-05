@@ -9,8 +9,8 @@ var Time = React.createClass({
   'render': function () {
 
     return (
-      <div class="time">
-        <h2> By when does it need to be completed? </h2>
+      <div class="time p2 center container">
+        <h4 className="bold inline-block m0 mb1">By when does it need to be completed? </h4>
         <input type="time" className="due-date" />
       </div>
     );
