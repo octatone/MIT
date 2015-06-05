@@ -21987,11 +21987,11 @@ var Steps = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "steps" },
+      { className: "steps p2 center container" },
       React.createElement(
-        "h2",
-        null,
-        " What are the steps to get this done today "
+        "h4",
+        { className: "bold inline-block m0 mb1" },
+        "What are the steps to get this done today? "
       ),
       React.createElement("input", { className: "step-input", placeolder: "Add a Step", onKeydown: onKeydown }),
       React.createElement("ul", null)
@@ -22131,11 +22131,11 @@ var Time = React.createClass({
 
     return React.createElement(
       "div",
-      { "class": "time" },
+      { "class": "time p2 center container" },
       React.createElement(
-        "h2",
-        null,
-        " By when does it need to be completed? "
+        "h4",
+        { className: "bold inline-block m0 mb1" },
+        "By when does it need to be completed? "
       ),
       React.createElement("input", { type: "time", className: "due-date" })
     );
