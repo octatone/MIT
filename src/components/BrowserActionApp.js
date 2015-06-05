@@ -1,19 +1,12 @@
 'use strict';
 
 var React = require('react/addons');
-var NotificationsList = require('./NotificationsList');
 var Login = require('./Login');
+var Edit = require('./edit/Edit');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
 var BrowserActionApp = React.createClass({
-
-  'updateNotifications': function () {
-
-    this.setProps({
-      'notifications': background.currentNotifications
-    });
-  },
 
   'bindToStorage': function () {
 
@@ -39,7 +32,6 @@ var BrowserActionApp = React.createClass({
                   "from the extension");
 
       if (request.notifications === 'update') {
-        self.updateNotifications();
       }
     });
   },
@@ -52,9 +44,14 @@ var BrowserActionApp = React.createClass({
   'render': function () {
 
     var props = this.props;
+    var loggedIn = props.loggedIn;
+    var task = props.task;
 
-    if (props.loggedIn) {
-      return <NotificationsList {...props}/>;
+    if (loggedIn && !task) {
+      return <Edit {...props}/>;
+    }
+    else if (loggedIn && task) {
+      // view details
     }
     else {
       return <Login/>;
