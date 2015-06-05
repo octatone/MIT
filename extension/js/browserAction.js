@@ -22052,6 +22052,11 @@ var notifications = background.currentNotifications;
 
 background.fetchToken(function (accessToken) {
 
+  background.fetchLists().done(function (lists) {
+
+    console.log(lists);
+  });
+
   console.log("browserAction", accessToken);
 
   var browserActionApp = new BrowserActionApp({

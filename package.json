@@ -1,7 +1,7 @@
 {
-  "name": "Most Important Thing",
+  "name": "most-important-thing",
   "version": "0.3.0",
-  "description": "",
+  "description": "The Most Important Thing",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

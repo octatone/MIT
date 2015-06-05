@@ -1,6 +1,12 @@
 'use strict';
 
 var chrome = window.chrome;
+var wunderlist = window.wunderlist;
+var wunderbits = window.wunderbits;
+var WBDeferred = wunderbits.core.WBDeferred;
+var when = wunderbits.core.lib.when;
+
+
 // var clientID = 'Caq9b9StS2HEVA';
 // var authURL = 'https://www.reddit.com/api/v1/authorize';
 // var apiBase = 'https://oauth.reddit.com';
@@ -185,6 +191,48 @@ function fetchToken (callback) {
     //   callback();
     // }
   });
+}
+
+function getService (service) {
+
+  var options = {
+    'accessToken': accessToken,
+    'clientID': clientID,
+    'checkHealth': false
+  };
+
+  return new wunderlist.sdk.services[service]({
+    'config': options
+  });
+}
+
+function fetchLists () {
+
+  var deferred = new WBDeferred();
+  var lists, positions;
+
+  var listsRequest = getService('lists').all().done(function (allLists) {
+
+    lists = allLists;
+  });
+
+  var positionsRequest = getService('list_positions').all().done(function (allListPositions) {
+
+    positions = allListPositions;
+  });
+
+  when(listsRequest, positionsRequest)
+    .done(function () {
+
+      deferred.resolve(lists);
+    });
+
+  return deferred.promise();
+}
+
+function fetchTasks (listID) {
+
+  return getService('tasks').forList(listID);
 }
 
 function createNotification (data) {
