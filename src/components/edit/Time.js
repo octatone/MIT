@@ -9,8 +9,10 @@ var Time = React.createClass({
   'render': function () {
 
     return (
-      <h2> By when does it need to be completed? </h2>
-      <input type="time" className="due-date" />
+      <div class="time">
+        <h2> By when does it need to be completed? </h2>
+        <input type="time" className="due-date" />
+      </div>
     );
   }
 });

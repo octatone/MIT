@@ -15,12 +15,13 @@ var Steps = React.createClass({
   'render': function () {
 
     return (
-      <h2> What are the steps to get this done </b>today</b> </h2>
       <div className="steps">
-      <input className="step-input" placeolder="Add a Step" onKeydown={onKeydown} />
-      <ul>
+        <h2> What are the steps to get this done today </h2>
 
-      </ul>
+        <input className="step-input" placeolder="Add a Step" onKeydown={onKeydown} />
+        <ul>
+
+        </ul>
       </div>
     );
   }

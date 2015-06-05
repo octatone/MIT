@@ -9,8 +9,8 @@ var Task = React.createClass({
   'render': function () {
 
     return (
-      <h2>What is the most important thing to get done <b>today</b></h2>
       <div className="task-choice">
+        <h2>What is the most important thing to get done today</h2>
         <select className="lists">
         </select>
 
