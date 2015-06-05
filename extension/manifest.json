@@ -1,0 +1,35 @@
+{
+  "name": "Notifier for Reddit",
+  "version": "0.3.0",
+  "manifest_version": 2,
+  "description": "Desktop notifictations for your reddit inbox.",
+  "homepage_url": "http://google.com",
+  "icons": {
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "page": "html/background.html",
+    "persistent": true
+  },
+  "options_page": "html/options.html",
+  "browser_action": {
+    "default_title": "Notifier for Reddit",
+    "default_popup": "html/browserAction.html",
+    "default_icon": {
+      "19": "icons/envelope_read_19.png",
+      "38": "icons/envelope_read_38.png"
+    }
+  },
+  "permissions": [
+    "http://reddit-notifier-oauth-exchange.herokuapp.com/*",
+    "https://oauth.reddit.com/*",
+    "https://www.reddit.com/*",
+    "identity",
+    "notifications",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "tabs"
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApHbuuJyodO0+aNgNlhfDBCwEr3pt03oK5L6sIeDXrvQdBjsmVVjWHYlANQhsi7ug/we5hYIXUzMTgyWIDxhovGSPpWMuEcs4TRrKbYYte4f5XIogQSW9NIQv5R2ww+KKavIy5CfjrRXujUh96S2IAB9Z8QlUoBOUU10180EjcDzNmM9UsTPFasd3vUkXnNJmKmJBw418giJH0OTcDkBnvnhgSJN4wGIFyAiKJQe+eaqSYbay5dpnCV6SglrO9J/nizlL6gufY41I35ekxpLxcXcZF8YlFZ5RDNcEBW6cZyEHN61qxmmCNi/3uj3lLooLwdrWWpzOMNrPGPi7KueOlwIDAQAB"
+}
