@@ -22110,7 +22110,12 @@ var Task = React.createClass({
         " or "
       ),
       React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" }),
-      React.createElement("button", null)
+      React.createElement(
+        "div",
+        { className: "block mt3 mb1" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
+        React.createElement("button", { className: "circle bg-blue" })
+      )
     );
   }
 });
