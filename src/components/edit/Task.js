@@ -9,6 +9,7 @@ var Task = React.createClass({
   'render': function () {
 
     return (
+      <h2>What is the most important thing to get done <b>today</b></h2>
       <div className="task-choice">
         <select className="lists">
         </select>
@@ -16,7 +17,9 @@ var Task = React.createClass({
         <select className="tasks">
         </select>
 
-        <input className="task" />
+        <div className="divider"> or </div>
+
+        <input className="task" placeholder="Create a task" />
       </div>
     );
   }
