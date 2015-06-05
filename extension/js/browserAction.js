@@ -22109,7 +22109,8 @@ var Task = React.createClass({
         { className: "divider mb2 mt2 absolute-center" },
         " or "
       ),
-      React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" })
+      React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" }),
+      React.createElement("button", null)
     );
   }
 });

@@ -83,6 +83,8 @@ var Task = React.createClass({
 
         <div className="divider mb2 mt2 absolute-center"> or </div>
         <input className="task block fit-width field-light px1" placeholder="Create a task" />
+
+        <button></button>
       </div>
     );
   }
