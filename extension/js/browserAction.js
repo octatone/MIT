@@ -22014,7 +22014,74 @@ var background = chrome.extension.getBackgroundPage();
 var Task = React.createClass({
   displayName: "Task",
 
+  fetchTasks: function fetchTasks(listID) {
+
+    var self = this;
+
+    background.fetchTasks(listID).always(function (tasks) {
+
+      self.setState({
+        tasks: tasks || []
+      });
+    });
+  },
+
+  onListSelectChange: function onListSelectChange(e) {
+
+    var self = this;
+
+    self.setState({
+      selectedList: e.target.value
+    });
+
+    self.fetchTasks(e.target.value);
+  },
+
+  renderTaskOptions: function renderTaskOptions() {
+
+    return this.state.tasks.map(function (task) {
+
+      return React.createElement(
+        "option",
+        { key: task.id, value: task.id },
+        task.title
+      );
+    });
+  },
+
+  renderListOptions: function renderListOptions() {
+
+    return this.props.lists.map(function (list) {
+
+      return React.createElement(
+        "option",
+        { key: list.id, value: list.id },
+        list.title
+      );
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      tasks: []
+    };
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    var lists = self.props.lists;
+
+    if (lists.length) {
+      self.fetchTasks(lists[0].id);
+    }
+  },
+
   render: function render() {
+
+    var listOptions = this.renderListOptions();
+    var taskOptions = this.renderTaskOptions();
 
     return React.createElement(
       "div",
@@ -22024,8 +22091,19 @@ var Task = React.createClass({
         null,
         "What is the most important thing to get done today"
       ),
-      React.createElement("select", { className: "lists" }),
-      React.createElement("select", { className: "tasks" }),
+      React.createElement(
+        "select",
+        {
+          onChange: this.onListSelectChange,
+          className: "lists"
+        },
+        listOptions
+      ),
+      React.createElement(
+        "select",
+        { className: "tasks" },
+        taskOptions
+      ),
       React.createElement(
         "div",
         { className: "divider" },
@@ -22080,19 +22158,15 @@ var notifications = background.currentNotifications;
 
 background.fetchToken(function (accessToken) {
 
-  background.fetchLists().done(function (lists) {
+  background.fetchLists().always(function (lists) {
 
-    console.log(lists);
+    var browserActionApp = new BrowserActionApp({
+      lists: lists || [],
+      loggedIn: !!accessToken
+    });
+
+    React.render(browserActionApp, mountNode);
   });
-
-  console.log("browserAction", accessToken);
-
-  var browserActionApp = new BrowserActionApp({
-    notifications: notifications,
-    loggedIn: !!accessToken
-  });
-
-  React.render(browserActionApp, mountNode);
 });
 
 

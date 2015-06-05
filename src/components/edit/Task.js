@@ -6,15 +6,79 @@ var background = chrome.extension.getBackgroundPage();
 
 var Task = React.createClass({
 
+  'fetchTasks': function (listID) {
+
+    var self = this;
+
+    background.fetchTasks(listID).always(function (tasks) {
+
+      self.setState({
+        'tasks': tasks || []
+      });
+    });
+  },
+
+  'onListSelectChange': function (e) {
+
+    var self = this;
+
+    self.setState({
+      'selectedList': e.target.value
+    });
+
+    self.fetchTasks(e.target.value);
+  },
+
+  'renderTaskOptions': function () {
+
+    return this.state.tasks.map(function (task) {
+
+      return <option key={task.id} value={task.id}>{task.title}</option>;
+    });
+  },
+
+  'renderListOptions': function () {
+
+    return this.props.lists.map(function (list) {
+
+      return <option key={list.id} value={list.id}>{list.title}</option>;
+    });
+  },
+
+  'getInitialState': function () {
+
+    return {
+      'tasks': []
+    };
+  },
+
+  'componentDidMount': function () {
+
+    var self = this;
+    var lists = self.props.lists;
+
+    if (lists.length) {
+      self.fetchTasks(lists[0].id);
+    }
+  },
+
   'render': function () {
+
+    var listOptions = this.renderListOptions();
+    var taskOptions = this.renderTaskOptions();
 
     return (
       <div className="task-choice">
         <h2>What is the most important thing to get done today</h2>
-        <select className="lists">
+        <select
+          onChange={this.onListSelectChange}
+          className="lists"
+        >
+          {listOptions}
         </select>
 
         <select className="tasks">
+          {taskOptions}
         </select>
 
         <div className="divider"> or </div>
