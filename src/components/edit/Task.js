@@ -6,17 +6,79 @@ var background = chrome.extension.getBackgroundPage();
 
 var Task = React.createClass({
 
+  'fetchTasks': function (listID) {
+
+    var self = this;
+
+    background.fetchTasks(listID).always(function (tasks) {
+
+      self.setState({
+        'tasks': tasks || []
+      });
+    });
+  },
+
+  'onListSelectChange': function (e) {
+
+    var self = this;
+
+    self.setState({
+      'selectedList': e.target.value
+    });
+
+    self.fetchTasks(e.target.value);
+  },
+
+  'renderTaskOptions': function () {
+
+    return this.state.tasks.map(function (task) {
+
+      return <option key={task.id} value={task.id}>{task.title}</option>;
+    });
+  },
+
+  'renderListOptions': function () {
+
+    return this.props.lists.map(function (list) {
+
+      return <option key={list.id} value={list.id}>{list.title}</option>;
+    });
+  },
+
+  'getInitialState': function () {
+
+    return {
+      'tasks': []
+    };
+  },
+
+  'componentDidMount': function () {
+
+    var self = this;
+    var lists = self.props.lists;
+
+    if (lists.length) {
+      self.fetchTasks(lists[0].id);
+    }
+  },
+
   'render': function () {
+
+    var listOptions = this.renderListOptions();
+    var taskOptions = this.renderTaskOptions();
 
     return (
       <div className="task-choice p2 center container">
-        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today?</h4>
-        <select className="lists block px1 full-width">
-          <option> Select a List </option>
+        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today</h4>
+        <select
+          onChange={this.onListSelectChange}
+          className="lists block px1 full-width"
+        >
+          {listOptions}
         </select>
 
         <select className="tasks block px1 full-width">
-          <option> Select a Task in List X </option>
+          {taskOptions}
         </select>
 
         <div className="divider mb2 mt2 absolute-center"> or </div>

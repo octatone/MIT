@@ -40,7 +40,7 @@ gulp.task('build-manifest', ['build-copy'], function () {
 gulp.task('build-zip', ['build-copy', 'build-manifest', 'scripts'], function () {
 
   return gulp.src('build/src/**/*')
-    .pipe(zip('notifier-for-reddit.zip'))
+    .pipe(zip('most-important-thing.zip'))
     .pipe(gulp.dest('build'));
 });
 

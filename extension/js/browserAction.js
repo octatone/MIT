@@ -22014,7 +22014,74 @@ var background = chrome.extension.getBackgroundPage();
 var Task = React.createClass({
   displayName: "Task",
 
+  fetchTasks: function fetchTasks(listID) {
+
+    var self = this;
+
+    background.fetchTasks(listID).always(function (tasks) {
+
+      self.setState({
+        tasks: tasks || []
+      });
+    });
+  },
+
+  onListSelectChange: function onListSelectChange(e) {
+
+    var self = this;
+
+    self.setState({
+      selectedList: e.target.value
+    });
+
+    self.fetchTasks(e.target.value);
+  },
+
+  renderTaskOptions: function renderTaskOptions() {
+
+    return this.state.tasks.map(function (task) {
+
+      return React.createElement(
+        "option",
+        { key: task.id, value: task.id },
+        task.title
+      );
+    });
+  },
+
+  renderListOptions: function renderListOptions() {
+
+    return this.props.lists.map(function (list) {
+
+      return React.createElement(
+        "option",
+        { key: list.id, value: list.id },
+        list.title
+      );
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      tasks: []
+    };
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    var lists = self.props.lists;
+
+    if (lists.length) {
+      self.fetchTasks(lists[0].id);
+    }
+  },
+
   render: function render() {
+
+    var listOptions = this.renderListOptions();
+    var taskOptions = this.renderTaskOptions();
 
     return React.createElement(
       "div",
@@ -22026,21 +22093,16 @@ var Task = React.createClass({
       ),
       React.createElement(
         "select",
-        { className: "lists block px1 full-width" },
-        React.createElement(
-          "option",
-          null,
-          " Select a List "
-        )
+        {
+          onChange: this.onListSelectChange,
+          className: "lists block px1 full-width"
+        },
+        listOptions
       ),
       React.createElement(
         "select",
         { className: "tasks block px1 full-width" },
-        React.createElement(
-          "option",
-          null,
-          " Select a Task in List X "
-        )
+        taskOptions
       ),
       React.createElement(
         "div",
@@ -22096,14 +22158,15 @@ var notifications = background.currentNotifications;
 
 background.fetchToken(function (accessToken) {
 
-  console.log("browserAction", accessToken);
+  background.fetchLists().always(function (lists) {
 
-  var browserActionApp = new BrowserActionApp({
-    notifications: notifications,
-    loggedIn: !!accessToken
+    var browserActionApp = new BrowserActionApp({
+      lists: lists || [],
+      loggedIn: !!accessToken
+    });
+
+    React.render(browserActionApp, mountNode);
   });
-
-  React.render(browserActionApp, mountNode);
 });
 
 

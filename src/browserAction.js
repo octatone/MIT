@@ -10,12 +10,13 @@ var notifications = background.currentNotifications;
 
 background.fetchToken(function (accessToken) {
 
-  console.log('browserAction', accessToken);
+  background.fetchLists().always(function (lists) {
 
-  var browserActionApp = new BrowserActionApp({
-    'notifications': notifications,
-    'loggedIn': !!accessToken
+    var browserActionApp = new BrowserActionApp({
+      'lists': lists || [],
+      'loggedIn': !!accessToken
+    });
+
+    React.render(browserActionApp, mountNode);
   });
-
-  React.render(browserActionApp, mountNode);
 });
