@@ -13,7 +13,8 @@ var Task = React.createClass({
     background.fetchTasks(listID).always(function (tasks) {
 
       self.setState({
-        'tasks': tasks || []
+        'tasks': tasks || [],
+        'selectedTask': tasks && tasks.length && tasks[0].id
       });
     });
   },
@@ -27,6 +28,20 @@ var Task = React.createClass({
     });
 
     self.fetchTasks(e.target.value);
+  },
+
+  'onTaskSelectChange': function (e) {
+
+    var self = this;
+
+    self.setState({
+      'selectedTask': e.target.value
+    });
+  },
+
+  'onDoneClick': function () {
+
+    var self = this;
   },
 
   'renderTaskOptions': function () {
@@ -56,7 +71,6 @@ var Task = React.createClass({
 
     var self = this;
     var lists = self.props.lists;
-
     if (lists.length) {
       self.fetchTasks(lists[0].id);
     }
@@ -64,20 +78,23 @@ var Task = React.createClass({
 
   'render': function () {
 
-    var listOptions = this.renderListOptions();
-    var taskOptions = this.renderTaskOptions();
+    var self = this;
+    var listOptions = self.renderListOptions();
+    var taskOptions = self.renderTaskOptions();
 
     return (
       <div className="task-choice p2 center container">
-        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today</h4>
+        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today?</h4>
         <select
-          onChange={this.onListSelectChange}
+          onChange={self.onListSelectChange}
           className="lists block px1 full-width"
         >
           {listOptions}
         </select>
 
-        <select className="tasks block px1 full-width">
+        <select
+          onChange={self.onTaskSelectChange}
+          className="tasks block px1 full-width">
           {taskOptions}
         </select>
 
@@ -85,8 +102,9 @@ var Task = React.createClass({
         <input className="task block fit-width field-light px1" placeholder="Create a task" />
         <div className="block mt3 mb1">
           <span className="pictogram-icon wundercon icon-checkmark white absolute-center"></span>
-          <button className="circle bg-blue"></button>
+          <button onClick={self.onDoneClick} className="circle bg-blue"></button>
         </div>
+
       </div>
     );
   }
