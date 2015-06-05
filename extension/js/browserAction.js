@@ -22085,31 +22085,31 @@ var Task = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "task-choice" },
+      { className: "task-choice p2 center container" },
       React.createElement(
-        "h2",
-        null,
+        "h4",
+        { className: "bold inline-block m0 mb1" },
         "What is the most important thing to get done today"
       ),
       React.createElement(
         "select",
         {
           onChange: this.onListSelectChange,
-          className: "lists"
+          className: "lists block px1 full-width"
         },
         listOptions
       ),
       React.createElement(
         "select",
-        { className: "tasks" },
+        { className: "tasks block px1 full-width" },
         taskOptions
       ),
       React.createElement(
         "div",
-        { className: "divider" },
+        { className: "divider mb2 mt2 absolute-center" },
         " or "
       ),
-      React.createElement("input", { className: "task", placeholder: "Create a task" })
+      React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" })
     );
   }
 });
