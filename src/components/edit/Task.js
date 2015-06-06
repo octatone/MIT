@@ -22,12 +22,13 @@ var Task = React.createClass({
   'onListSelectChange': function (e) {
 
     var self = this;
+    var listID = e.target.value;
 
     self.setState({
-      'selectedList': e.target.value
+      'selectedList': listID
     });
 
-    self.fetchTasks(e.target.value);
+    self.fetchTasks(listID);
   },
 
   'onTaskSelectChange': function (e) {

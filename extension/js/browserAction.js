@@ -22021,7 +22021,8 @@ var Task = React.createClass({
     background.fetchTasks(listID).always(function (tasks) {
 
       self.setState({
-        tasks: tasks || []
+        tasks: tasks || [],
+        selectedTask: tasks && tasks.length && tasks[0].id
       });
     });
   },
@@ -22029,12 +22030,27 @@ var Task = React.createClass({
   onListSelectChange: function onListSelectChange(e) {
 
     var self = this;
+    var listID = e.target.value;
 
     self.setState({
-      selectedList: e.target.value
+      selectedList: listID
     });
 
-    self.fetchTasks(e.target.value);
+    self.fetchTasks(listID);
+  },
+
+  onTaskSelectChange: function onTaskSelectChange(e) {
+
+    var self = this;
+
+    self.setState({
+      selectedTask: e.target.value
+    });
+  },
+
+  onDoneClick: function onDoneClick() {
+
+    var self = this;
   },
 
   renderTaskOptions: function renderTaskOptions() {
@@ -22072,7 +22088,6 @@ var Task = React.createClass({
 
     var self = this;
     var lists = self.props.lists;
-
     if (lists.length) {
       self.fetchTasks(lists[0].id);
     }
@@ -22080,8 +22095,9 @@ var Task = React.createClass({
 
   render: function render() {
 
-    var listOptions = this.renderListOptions();
-    var taskOptions = this.renderTaskOptions();
+    var self = this;
+    var listOptions = self.renderListOptions();
+    var taskOptions = self.renderTaskOptions();
 
     return React.createElement(
       "div",
@@ -22089,19 +22105,21 @@ var Task = React.createClass({
       React.createElement(
         "h4",
         { className: "bold inline-block m0 mb1" },
-        "What is the most important thing to get done today"
+        "What is the most important thing to get done today?"
       ),
       React.createElement(
         "select",
         {
-          onChange: this.onListSelectChange,
+          onChange: self.onListSelectChange,
           className: "lists block px1 full-width"
         },
         listOptions
       ),
       React.createElement(
         "select",
-        { className: "tasks block px1 full-width" },
+        {
+          onChange: self.onTaskSelectChange,
+          className: "tasks block px1 full-width" },
         taskOptions
       ),
       React.createElement(
@@ -22114,7 +22132,7 @@ var Task = React.createClass({
         "div",
         { className: "block mt3 mb1" },
         React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
-        React.createElement("button", { className: "circle bg-blue" })
+        React.createElement("button", { onClick: self.onDoneClick, className: "circle bg-blue" })
       )
     );
   }
