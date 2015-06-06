@@ -1,7 +1,10 @@
-# Notifier for Reddit
-A Chrome extension that displays desktop notifications for new messages to your reddit inbox.
+# Most Important Thing
+A Chrome extension that annoys you to get stuff done.
 
-Available on the [chrome web store](https://chrome.google.com/webstore/detail/notifier-for-reddit/odmoedfabaohbdoiolgfhedcbfpcindh).
+  - Add a task, due time, and steps for completion
+  - Until task is done, extension does things to your browser to prevent goofing off.
+  - Stats: extension will track active tab domain open time and report with pretty graphs.
+
 
 ## Development
 Fork this repo, pull it down
