@@ -1,8 +1,8 @@
 {
-  "name": "Notifier for Reddit",
-  "version": "0.3.0",
+  "name": "Most Important Thing",
+  "version": "0.0.1",
   "manifest_version": 2,
-  "description": "Desktop notifictations for your reddit inbox.",
+  "description": "Don't let the browser stop you from getting things done.",
   "homepage_url": "http://google.com",
   "icons": {
     "128": "icons/icon128.png"
@@ -13,7 +13,7 @@
   },
   "options_page": "html/options.html",
   "browser_action": {
-    "default_title": "Notifier for Reddit",
+    "default_title": "Most Important Thing",
     "default_popup": "html/browserAction.html",
     "default_icon": {
       "19": "icons/envelope_read_19.png",
