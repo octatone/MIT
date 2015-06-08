@@ -69,7 +69,7 @@ var Task = React.createClass({
 
     return (
       <div className="task-choice p2 center container">
-        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today</h4>
+        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today?</h4>
         <select
           onChange={this.onListSelectChange}
           className="lists block px1 full-width"
