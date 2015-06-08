@@ -6,21 +6,19 @@ var background = chrome.extension.getBackgroundPage();
 
 var Steps = React.createClass({
 
-
-  'onKeydown': function (e) {
-
-    // if enter, add an li with the input val
+  'keydown': function (ev) {
+    if (ev.which === 13) {
+      // add a subtask
+    }
   },
 
   'render': function () {
 
     return (
       <div className="steps p2 center container">
-        <h4 className="bold inline-block m0 mb1">What are the steps to get this done today? </h4>
-
-        <input className="step-input" placeolder="Add a Step" onKeydown={onKeydown} />
+        <h4 className="bold inline-block m0 mb1">What are the steps to do this today? </h4>
+        <input className="step-input block fit-width field-light px1 mt1 mb1" placeolder="Step 1" onKeyDown={this.keydown}/>
         <ul>
-
         </ul>
       </div>
     );
