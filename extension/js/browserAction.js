@@ -21957,7 +21957,9 @@ var Edit = React.createClass({
         subview = React.createElement(Time, props);
         break;
       default:
-        subview = React.createElement(Task, props);
+        subview = React.createElement(Time, props);
+
+        // subview = <Task {...props} />;
     }
 
     return React.createElement(
@@ -22137,13 +22139,19 @@ var Time = React.createClass({
 
     return React.createElement(
       "div",
-      { "class": "time p2 center container" },
+      { className: "time p2 center container" },
       React.createElement(
         "h4",
         { className: "bold inline-block m0 mb1" },
-        "By when does it need to be completed? "
+        "What time today does it need to be completed? "
       ),
-      React.createElement("input", { type: "time", className: "due-date" })
+      React.createElement("input", { type: "time", className: "due-date block full-width field-light px1 mt1 mb1" }),
+      React.createElement(
+        "div",
+        { className: "block mt3 mb1" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
+        React.createElement("button", { className: "circle bg-blue" })
+      )
     );
   }
 });

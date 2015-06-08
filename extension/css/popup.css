@@ -22,6 +22,11 @@
   width: 95%;
 }
 
+input[type="time"] {
+  text-align: center;
+  padding-left:40px;
+}
+
 .icon-checkmark {
   color: white;
   text-align: center;
