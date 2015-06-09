@@ -22948,27 +22948,69 @@ var background = chrome.extension.getBackgroundPage();
 var Steps = React.createClass({
   displayName: "Steps",
 
-  onKeydown: function onKeydown(e) {},
+  keydown: function keydown(ev) {
+    if (ev.which === 13) {}
+  },
+
+  renderSteps: function renderSteps() {
+
+    return React.createElement("li", null);
+  },
 
   render: function render() {
 
+    var steps = this.renderSteps();
+
     return React.createElement(
       "div",
-      { className: "steps p2 center container" },
+      { className: "steps container" },
       React.createElement(
-        "h4",
-        { className: "bold inline-block m0 mb1" },
-        "What are the steps to get this done today? "
+        "div",
+        { className: "header steps" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-add" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          "What steps are needed to get this done today?"
+        )
       ),
-      React.createElement("input", { className: "step-input", placeolder: "Add a Step", onKeydown: onKeydown }),
-      React.createElement("ul", null)
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Break down this task into small pieces"
+        ),
+        React.createElement("input", { className: "step-input block inline-block field-light px1 mt1 mb1", placeholder: "Add a step", onKeyDown: this.keydown }),
+        React.createElement(
+          "button",
+          { className: "ml1 button button-outline yellow left-align inline-block add " },
+          "Add"
+        ),
+        React.createElement(
+          "ul",
+          { className: "list-reset" },
+          steps
+        ),
+        React.createElement(
+          "div",
+          { className: "button-wrapper" },
+          React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
+          React.createElement(
+            "button",
+            { className: "bg-blue left-align white next" },
+            "Next"
+          )
+        )
+      )
     );
   }
 });
 
 module.exports = Steps;
 
-// if enter, add an li with the input val
+// add a subtask
 
 
 },{"react/addons":6}],183:[function(require,module,exports){
@@ -23089,48 +23131,70 @@ var Task = React.createClass({
     var hasTasks = !!(state.tasks && state.tasks.length);
     var ready = !!(state.taskID || state.taskTitle);
 
-    console.log("hasTasks?", hasTasks);
-
     return React.createElement(
       "div",
-      { className: "task-choice p2 center container" },
+      { className: "task-choice container" },
       React.createElement(
-        "h4",
-        { className: "bold inline-block m0 mb1" },
-        "What is the most important thing to get done today?"
-      ),
-      React.createElement(
-        "select",
-        {
-          onChange: self.onListSelectChange,
-          className: "lists block px1 full-width" },
-        listOptions
-      ),
-      React.createElement(
-        "select",
-        {
-          onTaskInputChange: self.onTaskInputChange,
-          className: "tasks block px1 full-width",
-          disabled: !hasTasks },
-        taskOptions
+        "div",
+        { className: "header tasks" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-star-filled" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          "What is the most important thing to get done today?"
+        )
       ),
       React.createElement(
         "div",
-        { className: "divider mb2 mt2 absolute-center" },
-        " or "
-      ),
-      React.createElement("input", {
-        className: "task block fit-width field-light px1",
-        placeholder: "Create a task",
-        onChange: self.onTaskInputChange }),
-      React.createElement(
-        "div",
-        { className: "block mt3 mb1" },
-        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
-        React.createElement("button", {
-          className: "circle bg-blue",
-          onClick: self.onClickDone,
-          disabled: !ready })
+        { className: "content-wrapper" },
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Choose a list"
+        ),
+        React.createElement(
+          "select",
+          {
+            onChange: this.onListSelectChange,
+            className: "lists block px1 full-width"
+          },
+          listOptions
+        ),
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Choose an existing task"
+        ),
+        React.createElement(
+          "select",
+          {
+            onChange: self.onTaskInputChange,
+            className: "tasks block px1 full-width",
+            disabled: !hasTasks },
+          taskOptions
+        ),
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Or create a new one"
+        ),
+        React.createElement("input", {
+          className: "task block fit-width field-light px1",
+          placeholder: "Input a thing you want to get done",
+          onChange: self.onTaskInputChange }),
+        React.createElement(
+          "div",
+          { className: "button-wrapper" },
+          React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
+          React.createElement(
+            "button",
+            {
+              className: "bg-blue left-align white next",
+              onClick: self.onClickDone,
+              disabled: !ready },
+            "Next"
+          )
+        )
       )
     );
   }
@@ -23153,13 +23217,19 @@ var Time = React.createClass({
 
     return React.createElement(
       "div",
-      { "class": "time p2 center container" },
+      { className: "time p2 center container" },
       React.createElement(
         "h4",
-        { className: "bold inline-block m0 mb1" },
-        "By when does it need to be completed? "
+        { className: "inline-block m0 mb1" },
+        "What time today does it need to be completed? "
       ),
-      React.createElement("input", { type: "time", className: "due-date" })
+      React.createElement("input", { type: "time", className: "due-date block full-width field-light px1 mt1 mb1" }),
+      React.createElement(
+        "div",
+        { className: "block mt3 mb1" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
+        React.createElement("button", { className: "circle bg-blue" })
+      )
     );
   }
 });
