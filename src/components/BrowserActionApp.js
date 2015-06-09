@@ -1,12 +1,22 @@
 'use strict';
 
 var React = require('react/addons');
+var applicationState = require('../stores/applicationState');
+var bindableMixin = require('../mixins/bindable');
 var Login = require('./Login');
 var Edit = require('./edit/Edit');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
 var BrowserActionApp = React.createClass({
+
+  'mixins': [
+    bindableMixin
+  ],
+
+  'bindToApplicationState': function () {
+
+  },
 
   'bindToStorage': function () {
 
@@ -38,7 +48,9 @@ var BrowserActionApp = React.createClass({
 
   'componentDidMount': function () {
 
-    this.bindToStorage();
+    var self = this;
+    self.bindToStorage();
+    self.bindToApplicationState();
   },
 
   'render': function () {
