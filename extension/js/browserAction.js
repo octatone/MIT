@@ -21957,7 +21957,9 @@ var Edit = React.createClass({
         subview = React.createElement(Time, props);
         break;
       default:
-        subview = React.createElement(Task, props);
+        subview = React.createElement(Steps, props);
+
+        //        subview = <Task {...props} />;
     }
 
     return React.createElement(
@@ -21996,17 +21998,46 @@ var Steps = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "steps p2 center container" },
+      { className: "steps container" },
       React.createElement(
-        "h4",
-        { className: "inline-block m0 mb1" },
-        "What are the steps to do this today? "
+        "div",
+        { className: "header steps" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-add" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          "What steps are needed to get this done today?"
+        )
       ),
-      React.createElement("input", { className: "step-input block fit-width field-light px1 mt1 mb1", placeolder: "Step 1", onKeyDown: this.keydown }),
       React.createElement(
-        "ul",
-        null,
-        steps
+        "div",
+        { className: "content-wrapper" },
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Break down this task into small pieces"
+        ),
+        React.createElement("input", { className: "step-input block inline-block field-light px1 mt1 mb1", placeholder: "Add a step", onKeyDown: this.keydown }),
+        React.createElement(
+          "button",
+          { className: "ml1 button button-outline yellow left-align inline-block add " },
+          "Add"
+        ),
+        React.createElement(
+          "ul",
+          { className: "list-reset" },
+          steps
+        ),
+        React.createElement(
+          "div",
+          { className: "button-wrapper" },
+          React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
+          React.createElement(
+            "button",
+            { className: "bg-blue left-align white next" },
+            "Next"
+          )
+        )
       )
     );
   }
@@ -22140,14 +22171,14 @@ var Task = React.createClass({
           { className: "subheading" },
           "Or create a new one"
         ),
-        React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" }),
+        React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Input a thing you want to get done" }),
         React.createElement(
           "div",
           { className: "button-wrapper" },
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
-            { className: "bg-blue left-align white" },
+            { className: "bg-blue left-align white next" },
             "Next"
           )
         )

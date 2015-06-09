@@ -14,7 +14,7 @@ var Steps = React.createClass({
 
   'renderSteps': function () {
 
-    return <li >{''}</li>;
+    return <li>{''}</li>;
   },
 
   'render': function () {
@@ -22,12 +22,23 @@ var Steps = React.createClass({
     var steps = this.renderSteps();
 
     return (
-      <div className="steps p2 center container">
-        <h4 className="inline-block m0 mb1">What are the steps to do this today? </h4>
-        <input className="step-input block fit-width field-light px1 mt1 mb1" placeolder="Step 1" onKeyDown={this.keydown}/>
-        <ul>
-        {steps}
-        </ul>
+      <div className="steps container">
+        <div className="header steps">
+          <span className="pictogram-icon wundercon icon-add"></span>
+          <h2 className="inline-block m0 mb1">What steps are needed to get this done today?</h2>
+        </div>
+        <div className="content-wrapper">
+          <h4 className="subheading">Break down this task into small pieces</h4>
+          <input className="step-input block inline-block field-light px1 mt1 mb1" placeholder="Add a step" onKeyDown={this.keydown}/>
+          <button className="ml1 button button-outline yellow left-align inline-block add ">Add</button>
+          <ul className="list-reset">
+          {steps}
+          </ul>
+          <div className="button-wrapper">
+            <span className="pictogram-icon wundercon icon-back white"></span>
+            <button className="bg-blue left-align white next">Next</button>
+          </div>
+        </div>
       </div>
     );
   }

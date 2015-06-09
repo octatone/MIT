@@ -22,8 +22,15 @@ body {
   display: inline-block;
 }
 
-.header .wundercon {
+.header .wundercon.icon-star-filled {
   color: #2b88d9;
+}
+
+.header .wundercon.icon-add {
+  color:#E6B035;
+}
+
+.header .wundercon {
   position: absolute;
   z-index: 5;
   left: auto;
@@ -49,6 +56,10 @@ body {
   z-index: 0;
   right: 0;
   box-shadow: 0px 1px 1px #D5D5D5;
+}
+
+.header.steps {
+  background-color: #E6B035;
 }
 
 .header.tasks {
@@ -85,7 +96,7 @@ body {
 }
 
 .fit-width {
-  width: 95%;
+  width: 93%;
 }
 
 input[type="time"] {
@@ -120,7 +131,22 @@ select {
   z-index: 50;
 }
 
-button.bg-blue {
+.step-input {
+  padding-right: 21px;
+  vertical-align: middle;
+}
+
+button.add {
+  margin-left: 5px;
+  height: 46px;
+  vertical-align: middle;
+}
+
+button {
+  border-radius: 4px;
+}
+
+button.bg-blue.next {
   width: 90px;
   text-indent: 4px
 }

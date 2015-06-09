@@ -87,10 +87,10 @@ var Task = React.createClass({
           </select>
 
           <h4 className="subheading">Or create a new one</h4>
-          <input className="task block fit-width field-light px1" placeholder="Create a task" />
+          <input className="task block fit-width field-light px1" placeholder="Input a thing you want to get done" />
           <div className="button-wrapper">
             <span className="pictogram-icon wundercon icon-back white"></span>
-            <button className="bg-blue left-align white">Next</button>
+            <button className="bg-blue left-align white next">Next</button>
           </div>
         </div>
       </div>
