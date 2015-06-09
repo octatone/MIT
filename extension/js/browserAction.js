@@ -23030,6 +23030,11 @@ var Steps = React.createClass({
         React.createElement(
           "div",
           { className: "button-wrapper" },
+          React.createElement(
+            "button",
+            { className: "left ml1 button button-outline blue" },
+            "Back"
+          ),
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
@@ -23227,6 +23232,11 @@ var Task = React.createClass({
         React.createElement(
           "div",
           { className: "button-wrapper" },
+          React.createElement(
+            "button",
+            { className: "left ml1 button button-outline blue" },
+            "Back"
+          ),
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
@@ -23287,6 +23297,11 @@ var Time = React.createClass({
         React.createElement(
           "div",
           { className: "button-wrapper" },
+          React.createElement(
+            "button",
+            { className: "left ml1 button button-outline blue" },
+            "Back"
+          ),
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",

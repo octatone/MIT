@@ -21,6 +21,7 @@ var Time = React.createClass({
             <input type="time" className="due-date inline-block " />
           </div>
           <div className="button-wrapper">
+            <button className="left ml1 button button-outline blue">Back</button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button className="bg-blue left-align white next">Next</button>
           </div>

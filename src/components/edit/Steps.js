@@ -41,6 +41,7 @@ var Steps = React.createClass({
           {steps}
           </ul>
           <div className="button-wrapper">
+            <button className="left ml1 button button-outline blue">Back</button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
               onClick={self.onClickNext}
