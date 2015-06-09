@@ -6,6 +6,11 @@ var background = chrome.extension.getBackgroundPage();
 
 var Steps = React.createClass({
 
+  'onClickNext': function () {
+
+    this.props.onDone();
+  },
+
   'keydown': function (ev) {
     if (ev.which === 13) {
       // add a subtask
@@ -19,7 +24,8 @@ var Steps = React.createClass({
 
   'render': function () {
 
-    var steps = this.renderSteps();
+    var self = this;
+    var steps = self.renderSteps();
 
     return (
       <div className="steps container">
@@ -36,7 +42,11 @@ var Steps = React.createClass({
           </ul>
           <div className="button-wrapper">
             <span className="pictogram-icon wundercon icon-back white"></span>
-            <button className="bg-blue left-align white next">Next</button>
+            <button
+              onClick={self.onClickNext}
+              className="bg-blue left-align white next">
+                Next
+            </button>
           </div>
         </div>
       </div>

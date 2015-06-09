@@ -4,10 +4,30 @@ var React = require('react/addons');
 var Task = require('./Task');
 var Steps = require('./Steps');
 var Time = require('./Time');
+var actions = require('../../actions/appActions');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
 var Edit = React.createClass({
+
+  'onTaskDone': function () {
+
+    this.setState({
+      'subview': 'steps'
+    });
+  },
+
+  'onStepsDone': function () {
+
+    this.setState({
+      'subview': 'time'
+    });
+  },
+
+  'onTimeDone': function () {
+
+    appActions.setDoneEditing();
+  },
 
   'getInitialState': function () {
 
@@ -25,13 +45,13 @@ var Edit = React.createClass({
 
     switch (subviewState) {
       case 'steps':
-        subview = <Steps {...props} />;
+        subview = <Steps {...props} onDone={self.onStepsDone}/>;
         break;
       case 'time':
-        subview = <Time {...props} />;
+        subview = <Time {...props} onDone={self.onTimeDone}/>;
         break;
       default:
-        subview = <Task {...props} />;
+        subview = <Task {...props} onDone={self.onTaskDone}/>;
     }
 
     return (

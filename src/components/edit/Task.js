@@ -23,18 +23,20 @@ var Task = React.createClass({
   'onListSelectChange': function (e) {
 
     var self = this;
+    var listID = e.target.value && parseInt(e.target.value, 10);
 
     self.setState({
-      'selectedList': e.target.value
+      'selectedList': listID
     });
 
-    self.fetchTasks(e.target.value);
+    self.fetchTasks(listID);
   },
 
   'onTaskSelectChange': function (e) {
 
+    var taskID = e.target.value && parseInt(e.target.value, 10);
     this.setState({
-      'selectedTask': e.target.value
+      'selectedTask': taskID
     });
   },
 
@@ -49,14 +51,18 @@ var Task = React.createClass({
 
     var self = this;
     var state = self.state;
+    var props = self.props;
+
     var taskTitle = state.taskTitle;
     if (taskTitle && taskTitle.length) {
       console.info('creating tast', taskTitle);
       actions.createTaskAndSetTaskID(taskTitle, self.state.selectedList);
+      props.onDone();
     }
     else {
       console.log('setting task id to', state.taskID);
       actions.setTaskID(state.taskID);
+      props.onDone();
     }
   },
 

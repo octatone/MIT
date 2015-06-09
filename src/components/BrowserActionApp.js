@@ -16,6 +16,9 @@ var BrowserActionApp = React.createClass({
 
   'bindToApplicationState': function () {
 
+    var self = this;
+
+
   },
 
   'bindToStorage': function () {
@@ -57,12 +60,12 @@ var BrowserActionApp = React.createClass({
 
     var props = this.props;
     var loggedIn = props.loggedIn;
-    var task = props.task;
+    var taskDefined = props.taskID;
 
-    if (loggedIn && !task) {
+    if (loggedIn && !taskDefined) {
       return <Edit {...props}/>;
     }
-    else if (loggedIn && task) {
+    else if (loggedIn && taskDefined) {
       // view details
     }
     else {

@@ -22,10 +22,15 @@ module.exports = {
 
     console.info('createTaskAndSetTaskID', taskTitle, listID);
     var self = this;
-    background.createTask(taskTitle, listID).done(function (task) {
+    background.createTask(taskTitle, listID)
+      .done(function (task) {
 
-      console.info('created task', task.id);
-      self.setTaskID(task.id);
-    });
+        console.info('created task', task.id);
+        self.setTaskID(task.id);
+      })
+      .fail(function () {
+
+        console.error(arguments);
+      });
   }
 };

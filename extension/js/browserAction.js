@@ -22787,6 +22787,9 @@ module.exports = {
 
       console.info("created task", task.id);
       self.setTaskID(task.id);
+    }).fail(function () {
+
+      console.error(arguments);
     });
   }
 };
@@ -22808,7 +22811,10 @@ var BrowserActionApp = React.createClass({
 
   mixins: [bindableMixin],
 
-  bindToApplicationState: function bindToApplicationState() {},
+  bindToApplicationState: function bindToApplicationState() {
+
+    var self = this;
+  },
 
   bindToStorage: function bindToStorage() {
 
@@ -22841,11 +22847,11 @@ var BrowserActionApp = React.createClass({
 
     var props = this.props;
     var loggedIn = props.loggedIn;
-    var task = props.task;
+    var taskDefined = props.taskID;
 
-    if (loggedIn && !task) {
+    if (loggedIn && !taskDefined) {
       return React.createElement(Edit, props);
-    } else if (loggedIn && task) {} else {
+    } else if (loggedIn && taskDefined) {} else {
       return React.createElement(Login, null);
     }
   }
@@ -22892,15 +22898,37 @@ module.exports = Login;
 },{"react/addons":6}],181:[function(require,module,exports){
 "use strict";
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = require("react/addons");
 var Task = require("./Task");
 var Steps = require("./Steps");
 var Time = require("./Time");
+var actions = require("../../actions/appActions");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
 var Edit = React.createClass({
   displayName: "Edit",
+
+  onTaskDone: function onTaskDone() {
+
+    this.setState({
+      subview: "steps"
+    });
+  },
+
+  onStepsDone: function onStepsDone() {
+
+    this.setState({
+      subview: "time"
+    });
+  },
+
+  onTimeDone: function onTimeDone() {
+
+    appActions.setDoneEditing();
+  },
 
   getInitialState: function getInitialState() {
 
@@ -22918,13 +22946,13 @@ var Edit = React.createClass({
 
     switch (subviewState) {
       case "steps":
-        subview = React.createElement(Steps, props);
+        subview = React.createElement(Steps, _extends({}, props, { onDone: self.onStepsDone }));
         break;
       case "time":
-        subview = React.createElement(Time, props);
+        subview = React.createElement(Time, _extends({}, props, { onDone: self.onTimeDone }));
         break;
       default:
-        subview = React.createElement(Task, props);
+        subview = React.createElement(Task, _extends({}, props, { onDone: self.onTaskDone }));
     }
 
     return React.createElement(
@@ -22938,7 +22966,7 @@ var Edit = React.createClass({
 module.exports = Edit;
 
 
-},{"./Steps":182,"./Task":183,"./Time":184,"react/addons":6}],182:[function(require,module,exports){
+},{"../../actions/appActions":178,"./Steps":182,"./Task":183,"./Time":184,"react/addons":6}],182:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -22947,6 +22975,11 @@ var background = chrome.extension.getBackgroundPage();
 
 var Steps = React.createClass({
   displayName: "Steps",
+
+  onClickNext: function onClickNext() {
+
+    this.props.onDone();
+  },
 
   keydown: function keydown(ev) {
     if (ev.which === 13) {}
@@ -22959,7 +22992,8 @@ var Steps = React.createClass({
 
   render: function render() {
 
-    var steps = this.renderSteps();
+    var self = this;
+    var steps = self.renderSteps();
 
     return React.createElement(
       "div",
@@ -22999,7 +23033,9 @@ var Steps = React.createClass({
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
-            { className: "bg-blue left-align white next" },
+            {
+              onClick: self.onClickNext,
+              className: "bg-blue left-align white next" },
             "Next"
           )
         )
@@ -23040,18 +23076,20 @@ var Task = React.createClass({
   onListSelectChange: function onListSelectChange(e) {
 
     var self = this;
+    var listID = e.target.value && parseInt(e.target.value, 10);
 
     self.setState({
-      selectedList: e.target.value
+      selectedList: listID
     });
 
-    self.fetchTasks(e.target.value);
+    self.fetchTasks(listID);
   },
 
   onTaskSelectChange: function onTaskSelectChange(e) {
 
+    var taskID = e.target.value && parseInt(e.target.value, 10);
     this.setState({
-      selectedTask: e.target.value
+      selectedTask: taskID
     });
   },
 
@@ -23066,13 +23104,17 @@ var Task = React.createClass({
 
     var self = this;
     var state = self.state;
+    var props = self.props;
+
     var taskTitle = state.taskTitle;
     if (taskTitle && taskTitle.length) {
       console.info("creating tast", taskTitle);
       actions.createTaskAndSetTaskID(taskTitle, self.state.selectedList);
+      props.onDone();
     } else {
       console.log("setting task id to", state.taskID);
       actions.setTaskID(state.taskID);
+      props.onDone();
     }
   },
 
