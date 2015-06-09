@@ -71,7 +71,7 @@ var Task = React.createClass({
       <div className="task-choice container">
         <div className="header tasks">
           <span className="pictogram-icon wundercon icon-star-filled"></span>
-          <h2 className="inline-block m0 mb1">What is the most important thing to get done today?</h2>
+          <h2 className="inline-block m0 mb1">What is the most important thing to get done?</h2>
         </div>
         <div className="content-wrapper">
           <h4 className="subheading">Choose a list</h4>

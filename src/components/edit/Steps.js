@@ -25,7 +25,7 @@ var Steps = React.createClass({
       <div className="steps container">
         <div className="header steps">
           <span className="pictogram-icon wundercon icon-add"></span>
-          <h2 className="inline-block m0 mb1">What steps are needed to get this done today?</h2>
+          <h2 className="inline-block m0 mb1">What steps are needed to get this done?</h2>
         </div>
         <div className="content-wrapper">
           <h4 className="subheading">Break down this task into small pieces</h4>

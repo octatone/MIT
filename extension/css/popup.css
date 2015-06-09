@@ -30,6 +30,10 @@ body {
   color:#E6B035;
 }
 
+.header .icon-reminder {
+  color: #65B01B;
+}
+
 .header .wundercon {
   position: absolute;
   z-index: 5;
@@ -64,6 +68,10 @@ body {
 
 .header.tasks {
   background-color: #2b88d9;
+}
+
+.header.time {
+  background-color: #65B01B;
 }
 
 .content-wrapper {
@@ -101,7 +109,6 @@ body {
 
 input[type="time"] {
   text-align: center;
-  padding-left:40px;
 }
 
 select {
@@ -156,4 +163,27 @@ button.bg-blue.next {
   height: 30px;
   width: 30px;
   cursor: pointer;
+}
+
+.fake-input {
+  height:42px;
+  border-radius:4px;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc;
+
+}
+
+.fake-input input {
+  border: none;
+  padding: 0;
+  margin: 0;
+  height: 42px;
+  vertical-align: top;
+  padding: 0 8px;
+}
+
+.fake-input input[type="date"] {
+  width: 155px;
 }
