@@ -68,24 +68,30 @@ var Task = React.createClass({
     var taskOptions = this.renderTaskOptions();
 
     return (
-      <div className="task-choice p2 center container">
-        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today?</h4>
-        <select
-          onChange={this.onListSelectChange}
-          className="lists block px1 full-width"
-        >
-          {listOptions}
-        </select>
+      <div className="task-choice container">
+        <div className="header tasks">
+          <span className="pictogram-icon wundercon icon-star-filled"></span>
+          <h2 className="inline-block m0 mb1">What is the most important thing to get done today?</h2>
+        </div>
+        <div className="content-wrapper">
+          <h4 className="subheading">Choose a list</h4>
+          <select
+            onChange={this.onListSelectChange}
+            className="lists block px1 full-width"
+          >
+            {listOptions}
+          </select>
+          <h4 className="subheading">Choose an existing task</h4>
+          <select className="tasks block px1 full-width">
+            {taskOptions}
+          </select>
 
-        <select className="tasks block px1 full-width">
-          {taskOptions}
-        </select>
-
-        <div className="divider mb2 mt2 absolute-center"> or </div>
-        <input className="task block fit-width field-light px1" placeholder="Create a task" />
-        <div className="block mt3 mb1">
-          <span className="pictogram-icon wundercon icon-checkmark white absolute-center"></span>
-          <button className="circle bg-blue"></button>
+          <h4 className="subheading">Or create a new one</h4>
+          <input className="task block fit-width field-light px1" placeholder="Create a task" />
+          <div className="button-wrapper">
+            <span className="pictogram-icon wundercon icon-back white"></span>
+            <button className="bg-blue left-align white">Next</button>
+          </div>
         </div>
       </div>
     );

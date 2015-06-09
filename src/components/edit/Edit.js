@@ -31,9 +31,7 @@ var Edit = React.createClass({
         subview = <Time {...props} />;
         break;
       default:
-        subview = <Time {...props} />;
-
-        // subview = <Task {...props} />;
+        subview = <Task {...props} />;
     }
 
     return (

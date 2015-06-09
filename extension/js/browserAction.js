@@ -21957,9 +21957,7 @@ var Edit = React.createClass({
         subview = React.createElement(Time, props);
         break;
       default:
-        subview = React.createElement(Time, props);
-
-        // subview = <Task {...props} />;
+        subview = React.createElement(Task, props);
     }
 
     return React.createElement(
@@ -21983,27 +21981,40 @@ var background = chrome.extension.getBackgroundPage();
 var Steps = React.createClass({
   displayName: "Steps",
 
-  onKeydown: function onKeydown(e) {},
+  keydown: function keydown(ev) {
+    if (ev.which === 13) {}
+  },
+
+  renderSteps: function renderSteps() {
+
+    return React.createElement("li", null);
+  },
 
   render: function render() {
+
+    var steps = this.renderSteps();
 
     return React.createElement(
       "div",
       { className: "steps p2 center container" },
       React.createElement(
         "h4",
-        { className: "bold inline-block m0 mb1" },
-        "What are the steps to get this done today? "
+        { className: "inline-block m0 mb1" },
+        "What are the steps to do this today? "
       ),
-      React.createElement("input", { className: "step-input", placeolder: "Add a Step", onKeydown: onKeydown }),
-      React.createElement("ul", null)
+      React.createElement("input", { className: "step-input block fit-width field-light px1 mt1 mb1", placeolder: "Step 1", onKeyDown: this.keydown }),
+      React.createElement(
+        "ul",
+        null,
+        steps
+      )
     );
   }
 });
 
 module.exports = Steps;
 
-// if enter, add an li with the input val
+// add a subtask
 
 
 },{"react/addons":2}],178:[function(require,module,exports){
@@ -22087,36 +22098,59 @@ var Task = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "task-choice p2 center container" },
+      { className: "task-choice container" },
       React.createElement(
-        "h4",
-        { className: "bold inline-block m0 mb1" },
-        "What is the most important thing to get done today?"
-      ),
-      React.createElement(
-        "select",
-        {
-          onChange: this.onListSelectChange,
-          className: "lists block px1 full-width"
-        },
-        listOptions
-      ),
-      React.createElement(
-        "select",
-        { className: "tasks block px1 full-width" },
-        taskOptions
+        "div",
+        { className: "header tasks" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-star-filled" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          "What is the most important thing to get done today?"
+        )
       ),
       React.createElement(
         "div",
-        { className: "divider mb2 mt2 absolute-center" },
-        " or "
-      ),
-      React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" }),
-      React.createElement(
-        "div",
-        { className: "block mt3 mb1" },
-        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
-        React.createElement("button", { className: "circle bg-blue" })
+        { className: "content-wrapper" },
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Choose a list"
+        ),
+        React.createElement(
+          "select",
+          {
+            onChange: this.onListSelectChange,
+            className: "lists block px1 full-width"
+          },
+          listOptions
+        ),
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Choose an existing task"
+        ),
+        React.createElement(
+          "select",
+          { className: "tasks block px1 full-width" },
+          taskOptions
+        ),
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Or create a new one"
+        ),
+        React.createElement("input", { className: "task block fit-width field-light px1", placeholder: "Create a task" }),
+        React.createElement(
+          "div",
+          { className: "button-wrapper" },
+          React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
+          React.createElement(
+            "button",
+            { className: "bg-blue left-align white" },
+            "Next"
+          )
+        )
       )
     );
   }
@@ -22142,7 +22176,7 @@ var Time = React.createClass({
       { className: "time p2 center container" },
       React.createElement(
         "h4",
-        { className: "bold inline-block m0 mb1" },
+        { className: "inline-block m0 mb1" },
         "What time today does it need to be completed? "
       ),
       React.createElement("input", { type: "time", className: "due-date block full-width field-light px1 mt1 mb1" }),
