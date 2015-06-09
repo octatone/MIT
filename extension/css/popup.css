@@ -112,7 +112,10 @@ input[type="time"] {
 }
 
 select {
-  background-color: #fff
+  background-color: #fff;
+  appearance: menulist-button !important;
+  -moz-appearance: menulist-button !important;
+  -webkit-appearance:menulist-button !important;
 }
 
 .button-wrapper {
