@@ -23005,7 +23005,7 @@ var Steps = React.createClass({
         React.createElement(
           "h2",
           { className: "inline-block m0 mb1" },
-          "What steps are needed to get this done today?"
+          "What steps are needed to get this done?"
         )
       ),
       React.createElement(
@@ -23183,7 +23183,7 @@ var Task = React.createClass({
         React.createElement(
           "h2",
           { className: "inline-block m0 mb1" },
-          "What is the most important thing to get done today?"
+          "What is the most important thing to get done?"
         )
       ),
       React.createElement(
@@ -23259,18 +23259,41 @@ var Time = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "time p2 center container" },
-      React.createElement(
-        "h4",
-        { className: "inline-block m0 mb1" },
-        "What time today does it need to be completed? "
-      ),
-      React.createElement("input", { type: "time", className: "due-date block full-width field-light px1 mt1 mb1" }),
+      { className: "time container" },
       React.createElement(
         "div",
-        { className: "block mt3 mb1" },
-        React.createElement("span", { className: "pictogram-icon wundercon icon-checkmark white absolute-center" }),
-        React.createElement("button", { className: "circle bg-blue" })
+        { className: "header time" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-reminder" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          "When and at what time does this need to be completed?"
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement(
+          "h4",
+          { className: "subheading" },
+          "Pick a date and time that is practical"
+        ),
+        React.createElement(
+          "div",
+          { className: "fake-input mt1 mb1" },
+          React.createElement("input", { type: "date", className: "due-date inline-block half-width" }),
+          React.createElement("input", { type: "time", className: "due-date inline-block " })
+        ),
+        React.createElement(
+          "div",
+          { className: "button-wrapper" },
+          React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
+          React.createElement(
+            "button",
+            { className: "bg-blue left-align white next" },
+            "Next"
+          )
+        )
       )
     );
   }
