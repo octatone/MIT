@@ -1,12 +1,25 @@
 'use strict';
 
 var React = require('react/addons');
+var applicationState = require('../stores/applicationState');
+var bindableMixin = require('../mixins/bindable');
 var Login = require('./Login');
 var Edit = require('./edit/Edit');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
 var BrowserActionApp = React.createClass({
+
+  'mixins': [
+    bindableMixin
+  ],
+
+  'bindToApplicationState': function () {
+
+    var self = this;
+
+
+  },
 
   'bindToStorage': function () {
 
@@ -38,19 +51,21 @@ var BrowserActionApp = React.createClass({
 
   'componentDidMount': function () {
 
-    this.bindToStorage();
+    var self = this;
+    self.bindToStorage();
+    self.bindToApplicationState();
   },
 
   'render': function () {
 
     var props = this.props;
     var loggedIn = props.loggedIn;
-    var task = props.task;
+    var taskDefined = props.taskID;
 
-    if (loggedIn && !task) {
+    if (loggedIn && !taskDefined) {
       return <Edit {...props}/>;
     }
-    else if (loggedIn && task) {
+    else if (loggedIn && taskDefined) {
       // view details
     }
     else {

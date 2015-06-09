@@ -235,6 +235,14 @@ function fetchTasks (listID) {
   return getService('tasks').forList(listID);
 }
 
+function createTask (taskTitle, listID) {
+
+  return getService('tasks').create({
+    'title': taskTitle,
+    'list_id': listID
+  });
+}
+
 function createNotification (data) {
 
   // chrome.notifications.create(

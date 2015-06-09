@@ -3,17 +3,19 @@
 var React = require('react/addons');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var actions = require('../../actions/appActions');
 
 var Task = React.createClass({
 
   'fetchTasks': function (listID) {
 
     var self = this;
-
     background.fetchTasks(listID).always(function (tasks) {
 
+      tasks = tasks || [];
       self.setState({
-        'tasks': tasks || []
+        'tasks': tasks,
+        'taskID': tasks.length ? tasks[0].id : undefined
       });
     });
   },
@@ -21,12 +23,47 @@ var Task = React.createClass({
   'onListSelectChange': function (e) {
 
     var self = this;
+    var listID = e.target.value && parseInt(e.target.value, 10);
 
     self.setState({
-      'selectedList': e.target.value
+      'selectedList': listID
     });
 
-    self.fetchTasks(e.target.value);
+    self.fetchTasks(listID);
+  },
+
+  'onTaskSelectChange': function (e) {
+
+    var taskID = e.target.value && parseInt(e.target.value, 10);
+    this.setState({
+      'selectedTask': taskID
+    });
+  },
+
+  'onTaskInputChange': function (e) {
+
+    this.setState({
+      'taskTitle': e.target.value
+    });
+  },
+
+  'onClickDone': function () {
+
+    var self = this;
+    var state = self.state;
+    var props = self.props;
+
+    var taskTitle = state.taskTitle;
+    if (taskTitle && taskTitle.length) {
+      console.info('creating tast', taskTitle);
+      actions.createTaskAndSetTaskID(taskTitle, self.state.selectedList);
+      props.onDone();
+    }
+    else {
+      console.log('setting task id to', state.taskID);
+      actions.setTaskID(state.taskID);
+      props.onDone();
+    }
   },
 
   'renderTaskOptions': function () {
@@ -47,16 +84,20 @@ var Task = React.createClass({
 
   'getInitialState': function () {
 
+    var self = this;
+    var lists = self.props.lists;
     return {
-      'tasks': []
+      'tasks': [],
+      'selectedList': lists && lists.length && lists[0].id,
+      'taskID': undefined,
+      'taskTitle': undefined
     };
   },
 
   'componentDidMount': function () {
 
     var self = this;
-    var lists = self.props.lists;
-
+    var lists = self.props.lists || [];
     if (lists.length) {
       self.fetchTasks(lists[0].id);
     }
@@ -64,28 +105,51 @@ var Task = React.createClass({
 
   'render': function () {
 
-    var listOptions = this.renderListOptions();
-    var taskOptions = this.renderTaskOptions();
+    var self = this;
+
+    var state = self.state;
+    var listOptions = self.renderListOptions();
+    var taskOptions = self.renderTaskOptions();
+    var hasTasks = !!(state.tasks && state.tasks.length);
+    var ready = !!(state.taskID || state.taskTitle)
 
     return (
-      <div className="task-choice p2 center container">
-        <h4 className="bold inline-block m0 mb1">What is the most important thing to get done today?</h4>
-        <select
-          onChange={this.onListSelectChange}
-          className="lists block px1 full-width"
-        >
-          {listOptions}
-        </select>
+      <div className="task-choice container">
+        <div className="header tasks">
+          <span className="pictogram-icon wundercon icon-star-filled"></span>
+          <h2 className="inline-block m0 mb1">What is the most important thing to get done?</h2>
+        </div>
+        <div className="content-wrapper">
+          <h4 className="subheading">Choose a list</h4>
+          <select
+            onChange={this.onListSelectChange}
+            className="lists block px1 full-width"
+          >
+            {listOptions}
+          </select>
+          <h4 className="subheading">Choose an existing task</h4>
+          <select
+            onChange={self.onTaskInputChange}
+            className="tasks block px1 full-width"
+            disabled={!hasTasks}>
+            {taskOptions}
+          </select>
 
-        <select className="tasks block px1 full-width">
-          {taskOptions}
-        </select>
+          <h4 className="subheading">Or create a new one</h4>
+          <input
+            className="task block fit-width field-light px1"
+            placeholder="Input a thing you want to get done"
+            onChange={self.onTaskInputChange}/>
 
-        <div className="divider mb2 mt2 absolute-center"> or </div>
-        <input className="task block fit-width field-light px1" placeholder="Create a task" />
-        <div className="block mt3 mb1">
-          <span className="pictogram-icon wundercon icon-checkmark white absolute-center"></span>
-          <button className="circle bg-blue"></button>
+          <div className="button-wrapper">
+            <span className="pictogram-icon wundercon icon-back white"></span>
+            <button
+              className="bg-blue left-align white next"
+              onClick={self.onClickDone}
+              disabled={!ready}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     );

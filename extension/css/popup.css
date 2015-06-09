@@ -1,7 +1,92 @@
-.container {
-  width: 300px;
+body {
+  background-color:#fafafa !important;
 }
 
+.container {
+  width: 300px;
+  background-color:#fff;
+  margin: 1rem;
+  border-radius: 6px
+}
+
+.header {
+  color: #fff;
+  padding: 1em;
+  border-radius: 6px 6px 0 0;
+  text-align: left;
+  position: relative;
+}
+
+.header h2 {
+  font-size: 18px;
+  display: inline-block;
+}
+
+.header .wundercon.icon-star-filled {
+  color: #2b88d9;
+}
+
+.header .wundercon.icon-add {
+  color:#E6B035;
+}
+
+.header .icon-reminder {
+  color: #65B01B;
+}
+
+.header .wundercon {
+  position: absolute;
+  z-index: 5;
+  left: auto;
+  right: 10px;
+  bottom: 10px;
+}
+
+.header .wundercon::before {
+  z-index: 1;
+  text-align: center;
+  width: 50px;
+  right: 70%;
+  top: 80%;
+}
+
+.header .wundercon::after {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 100%;
+  z-index: 0;
+  right: 0;
+  box-shadow: 0px 1px 1px #D5D5D5;
+}
+
+.header.steps {
+  background-color: #E6B035;
+}
+
+.header.tasks {
+  background-color: #2b88d9;
+}
+
+.header.time {
+  background-color: #65B01B;
+}
+
+.content-wrapper {
+  padding-top: 20px;
+  padding: 1em;
+  border-left:1px solid #ccc;
+  border-right:1px solid #ccc;
+  border-bottom:1px solid #ccc;
+}
+
+.subheading {
+  font-size: 14px;
+  color: rgb(84, 84, 84);
+  font-weight: bold;
+}
 .divider {
   background-color: #fff;
   width: 15px;
@@ -9,7 +94,7 @@
 }
 
 .divider::after {
-    content: '';
+  content: '';
   position: absolute;
   width: 89%;
   border-top: 1px solid #ccc;
@@ -19,22 +104,61 @@
 }
 
 .fit-width {
-  width: 95%;
+  width: 93%;
 }
 
 input[type="time"] {
   text-align: center;
-  padding-left:40px;
 }
 
-.icon-checkmark {
-  color: white;
-  text-align: center;
-  z-index: 89;
-  margin-bottom: -25px;
+select {
+  background-color: #fff;
+  appearance: menulist-button !important;
+  -moz-appearance: menulist-button !important;
+  -webkit-appearance:menulist-button !important;
+}
+
+.button-wrapper {
+  text-align: right;
+  padding-top: 1em;
+  margin-top: 1em;
   position: relative;
+}
+
+.button-wrapper .icon-back {
+  transform: rotate(180deg);
+}
+
+.icon-back {
+  color: white;
+  top: 29%%;
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  right: -2px;
   cursor: pointer;
   pointer-events:none;
+  z-index: 50;
+}
+
+.step-input {
+  padding-right: 21px;
+  vertical-align: middle;
+}
+
+button.add {
+  margin-left: 5px;
+  height: 46px;
+  vertical-align: middle;
+}
+
+button {
+  border-radius: 4px;
+}
+
+button.bg-blue.next {
+  width: 90px;
+  text-indent: 4px
 }
 
 .circle {
@@ -42,4 +166,27 @@ input[type="time"] {
   height: 30px;
   width: 30px;
   cursor: pointer;
+}
+
+.fake-input {
+  height:42px;
+  border-radius:4px;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc;
+
+}
+
+.fake-input input {
+  border: none;
+  padding: 0;
+  margin: 0;
+  height: 42px;
+  vertical-align: top;
+  padding: 0 8px;
+}
+
+.fake-input input[type="date"] {
+  width: 155px;
 }
