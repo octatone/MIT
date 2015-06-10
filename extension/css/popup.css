@@ -19,6 +19,7 @@ body {
 
 .header h2 {
   font-size: 18px;
+  width: 85%;
   display: inline-block;
 }
 
@@ -116,6 +117,49 @@ select {
   appearance: menulist-button !important;
   -moz-appearance: menulist-button !important;
   -webkit-appearance:menulist-button !important;
+}
+
+.steps-list {
+  counter-reset:li;
+  margin-top:10px;
+  max-height: 260px;
+  overflow: scroll;
+}
+
+.num-list {
+  text-indent: 10px;
+  position:relative;
+  min-height: 50px;
+  margin-left: 35px;
+}
+
+.num-list:hover .delete-icon {
+  display: block;
+}
+
+.num-list::before {
+  content:counter(li);
+  counter-increment:li;
+  position:absolute;
+  top:0px;
+  left:-2em;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  box-sizing:border-box;
+  width:30px;
+  height: 30px;
+  border-radius: 100%;
+  color:#fff;
+  line-height: 29px;
+  background-color: #E6B035;
+}
+
+.delete-icon {
+  display: none;
+  margin-top: -2px;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 25px;
 }
 
 .button-wrapper {

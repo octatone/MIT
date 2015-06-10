@@ -52,10 +52,22 @@ var Steps = React.createClass({
     this.addStep();
   },
 
+  'deleteStep': function (index) {
+
+    var self = this;
+    var state = self.state;
+    state.steps.splice(index, 1);
+    self.setState({
+      'steps': state.steps,
+      'stepTitle': undefined
+    });
+  },
+
   'renderSteps': function () {
 
-    return this.state.steps.map(function (step) {
-      return <li key={step}>{step}</li>;
+    var self = this;
+    return this.state.steps.map(function (step, index) {
+      return <li key={step} className="num-list">{step} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteStep.bind(self, index)}></a></li>;
     });
   },
 
@@ -78,7 +90,7 @@ var Steps = React.createClass({
         <div className="header steps">
           <span className="pictogram-icon wundercon icon-add"></span>
           <h2 className="inline-block m0 mb1">
-            What steps are needed to get this done?
+            What are the steps needed to get this done?
           </h2>
         </div>
 
@@ -100,7 +112,7 @@ var Steps = React.createClass({
               Add
           </button>
 
-          <ul className="list-reset">
+          <ul className="list-reset steps-list">
             {steps}
           </ul>
 

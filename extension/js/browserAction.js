@@ -23043,13 +23043,27 @@ var Steps = React.createClass({
     this.addStep();
   },
 
+  deleteStep: function deleteStep(index) {
+
+    var self = this;
+    var state = self.state;
+    state.steps.splice(index, 1);
+    self.setState({
+      steps: state.steps,
+      stepTitle: undefined
+    });
+  },
+
   renderSteps: function renderSteps() {
 
-    return this.state.steps.map(function (step) {
+    var self = this;
+    return this.state.steps.map(function (step, index) {
       return React.createElement(
         "li",
-        { key: step },
-        step
+        { key: step, className: "num-list" },
+        step,
+        " ",
+        React.createElement("a", { className: "right pictogram-icon wundercon icon-x-active delete-icon light-gray", onClick: self.deleteStep.bind(self, index) })
       );
     });
   },
@@ -23078,7 +23092,7 @@ var Steps = React.createClass({
         React.createElement(
           "h2",
           { className: "inline-block m0 mb1" },
-          "What steps are needed to get this done?"
+          "What are the steps needed to get this done?"
         )
       ),
       React.createElement(
@@ -23104,7 +23118,7 @@ var Steps = React.createClass({
         ),
         React.createElement(
           "ul",
-          { className: "list-reset" },
+          { className: "list-reset steps-list" },
           steps
         ),
         React.createElement(
