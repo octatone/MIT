@@ -7,7 +7,8 @@ var WBDeferred = wunderbits.core.WBDeferred;
 var when = wunderbits.core.lib.when;
 
 var clientID = 'e6b771a5bb9c2b82f1ca';
-var authURL = 'https://www.wunderlist.com/oauth/authorize';
+var authBase = 'https://www.wunderlist.com';
+var authURL = authBase + '/oauth/authorize';
 var redirectURI = 'https://nkfmkemlekipdmmkemlpmolpffhdfkgj.chromiumapp.org/provider_cb';
 var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 
@@ -127,9 +128,16 @@ function login () {
 
 function logout () {
 
-  storage.remove([
-    'accessToken',
-  ]);
+  chrome.identity.launchWebAuthFlow({
+    'url': authBase + '/logout',
+    'interactive': false
+  }, function (resp) {
+
+    var err = chrome.runtime.lastError;
+    err && console.error(err.message);
+
+    storage.clear();
+  });
 }
 
 function fetchToken (callback) {
