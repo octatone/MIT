@@ -39,6 +39,10 @@ var BrowserActionApp = React.createClass({
                     storageChange.oldValue,
                     storageChange.newValue);
       }
+
+      if (changes.accessToken) {
+        self.onChangeAccessToken(changes.accessToken.newValue);
+      }
     });
 
     chrome.runtime.onMessage.addListener(function (request, sender) {
@@ -49,6 +53,18 @@ var BrowserActionApp = React.createClass({
 
       if (request.notifications === 'update') {
       }
+    });
+  },
+
+  'onChangeAccessToken': function (accessToken) {
+
+    var self = this;
+    background.fetchLists().always(function (lists) {
+
+      self.setProps({
+        'lists': lists || [],
+        'loggedIn': !!accessToken
+      });
     });
   },
 
@@ -68,7 +84,7 @@ var BrowserActionApp = React.createClass({
 
     var self = this;
     var props = self.props;
-    var state = self.state
+    var state = self.state;
     var loggedIn = props.loggedIn;
     var taskDefined = props.task;
 

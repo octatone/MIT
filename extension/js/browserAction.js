@@ -22840,6 +22840,10 @@ var BrowserActionApp = React.createClass({
         var storageChange = changes[key];
         console.log("Storage key \"%s\" in namespace \"%s\" changed. " + "Old value was \"%s\", new value is \"%s\".", key, namespace, storageChange.oldValue, storageChange.newValue);
       }
+
+      if (changes.accessToken) {
+        self.onChangeAccessToken(changes.accessToken.newValue);
+      }
     });
 
     chrome.runtime.onMessage.addListener(function (request, sender) {
@@ -22847,6 +22851,18 @@ var BrowserActionApp = React.createClass({
       console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
 
       if (request.notifications === "update") {}
+    });
+  },
+
+  onChangeAccessToken: function onChangeAccessToken(accessToken) {
+
+    var self = this;
+    background.fetchLists().always(function (lists) {
+
+      self.setProps({
+        lists: lists || [],
+        loggedIn: !!accessToken
+      });
     });
   },
 
@@ -23421,17 +23437,26 @@ var mountNode = document.getElementById("react-main-mount");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
+function renderApp(lists, accessToken) {
+
+  var browserActionApp = new BrowserActionApp({
+    lists: lists || [],
+    loggedIn: !!accessToken
+  });
+
+  React.render(browserActionApp, mountNode);
+}
+
 background.fetchToken(function (accessToken) {
 
-  background.fetchLists().always(function (lists) {
+  if (accessToken) {
+    background.fetchLists().always(function (lists) {
 
-    var browserActionApp = new BrowserActionApp({
-      lists: lists || [],
-      loggedIn: !!accessToken
+      renderApp(lists, accessToken);
     });
-
-    React.render(browserActionApp, mountNode);
-  });
+  } else {
+    renderApp();
+  }
 });
 
 

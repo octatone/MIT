@@ -8,15 +8,25 @@ var mountNode = document.getElementById('react-main-mount');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
+function renderApp (lists, accessToken) {
+
+  var browserActionApp = new BrowserActionApp({
+    'lists': lists || [],
+    'loggedIn': !!accessToken
+  });
+
+  React.render(browserActionApp, mountNode);
+}
+
 background.fetchToken(function (accessToken) {
 
-  background.fetchLists().always(function (lists) {
+  if (accessToken) {
+    background.fetchLists().always(function (lists) {
 
-    var browserActionApp = new BrowserActionApp({
-      'lists': lists || [],
-      'loggedIn': !!accessToken
+      renderApp(lists, accessToken);
     });
-
-    React.render(browserActionApp, mountNode);
-  });
+  }
+  else {
+    renderApp();
+  }
 });

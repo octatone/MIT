@@ -6,28 +6,17 @@ var wunderbits = window.wunderbits;
 var WBDeferred = wunderbits.core.WBDeferred;
 var when = wunderbits.core.lib.when;
 
-
-// var clientID = 'Caq9b9StS2HEVA';
-// var authURL = 'https://www.reddit.com/api/v1/authorize';
-// var apiBase = 'https://oauth.reddit.com';
-// var redirectURI = 'https://odmoedfabaohbdoiolgfhedcbfpcindh.chromiumapp.org/provider_cb';
-// var exchangeProxy = 'http://reddit-notifier-oauth-exchange.herokuapp.com';
-
-var accessToken = 'a1c22aa0ec0c59e83f3cce214d11af74d6e22c9e452cc41b2d8e24758638';
-var clientID = '498d3ffc44ddfa2f275b';
+var clientID = 'e6b771a5bb9c2b82f1ca';
+var authURL = 'https://www.wunderlist.com/oauth/authorize';
+var redirectURI = 'https://nkfmkemlekipdmmkemlpmolpffhdfkgj.chromiumapp.org/provider_cb';
+var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 
 var storage = chrome.storage.sync;
-var pollInterval = 15 * 1000;
 var timeout = 30 * 1000;
 
 var notifiedIds = {};
 var currentNotifications = [];
-var currentTimeout;
-
-// todo remove me
-storage.set({
-  'accessToken': accessToken
-});
+var accessToken;
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
@@ -46,6 +35,8 @@ chrome.notifications.onClicked.addListener(function (notificationID) {
 });
 
 function getParams (uri) {
+
+  console.log(uri);
 
   var params = {};
   var parts = uri.split('?');
@@ -69,100 +60,76 @@ function getUserAgentString () {
 
 function getAuthURL (state) {
 
-  // var options = {
-  //   'client_id': clientID,
-  //   'response_type': 'code',
-  //   'duration': 'permanent',
-  //   'redirect_uri': redirectURI,
-  //   'scope': 'privatemessages',
-  //   'state': state
-  // };
+  var options = {
+    'client_id': clientID,
+    'response_type': 'code',
+    'redirect_uri': redirectURI,
+    'state': state
+  };
 
-  // var parts = [];
-  // for (var key in options) {
-  //   parts.push(key + '=' + encodeURIComponent(options[key]));
-  // }
+  var parts = [];
+  for (var key in options) {
+    parts.push(key + '=' + encodeURIComponent(options[key]));
+  }
 
-  // return authURL + '?' + parts.join('&');
+  return authURL + '?' + parts.join('&');
 }
 
-function saveTokenData (data) {
+function saveTokenData (data, callback) {
 
-  // var saveData = {};
+  accessToken = data.access_token;
 
-  // data.access_token && (saveData.accessToken = data.access_token);
-  // data.refresh_token && (saveData.refreshToken = data.refresh_token);
+  var saveData = {
+    'accessToken': data.access_token
+  };
 
-  // if (data.expires_in) {
-  //   var now = Date.now();
-  //   saveData.expiration = now + (data.expires_in * 1000) - 60000;
-  // }
+  storage.set(saveData, function () {
 
-  // storage.set(saveData);
+    callback && callback();
+  });
 }
 
 function exchangeCode (code, callback) {
 
-  // $.ajax(exchangeProxy + '/exchange', {
-  //   'type': 'POST',
-  //   'data': {
-  //     'code': code
-  //   },
-  //   'timeout': timeout
-  // })
-  // .always(function (response) {
+  $.ajax(exchangeProxy + '/exchange', {
+    'type': 'POST',
+    'data': {
+      'code': code
+    },
+    'timeout': timeout
+  })
+  .always(function (response) {
 
-  //   if (response && response.access_token) {
-  //     saveTokenData(response);
-  //     callback && callback(response.access_token);
-  //   }
-  // });
-}
+    if (response && response.access_token) {
+      saveTokenData(response, function () {
 
-function exchangeRefreshToken (refreshToken, callback) {
-
-  // var accessToken;
-
-  // $.post(exchangeProxy + '/token', {
-  //   'refreshToken': refreshToken
-  // })
-  // .always(function (response) {
-
-  //   if (response && response.access_token) {
-  //     saveTokenData(response);
-  //     accessToken = response.access_token;
-  //   }
-
-  //   callback && callback(accessToken);
-  // });
+        callback && callback(response.access_token);
+      });
+    }
+  });
 }
 
 function login () {
 
-  // var state = ''+ Math.random();
+  var state = ''+ Math.random();
 
-  // chrome.identity.launchWebAuthFlow({
-  //   'url': getAuthURL(state),
-  //   'interactive': true
-  // },
-  // function (redirectURL) {
+  chrome.identity.launchWebAuthFlow({
+    'url': getAuthURL(state),
+    'interactive': true
+  }, function (redirectURL) {
 
-  //   var params = getParams(redirectURL);
-  //   if (params.state === state && params.code) {
-  //     exchangeCode(params.code, poll);
-  //   }
-  // });
+    var params = getParams(redirectURL);
+    if (params.state === state && params.code) {
+      exchangeCode(params.code);
+    }
+  });
 }
 
 function logout () {
 
-  // storage.remove([
-  //   'accessToken',
-  //   'refreshToken',
-  //   'expiration'
-  // ]);
-
-  // currentNotifications = [];
+  storage.remove([
+    'accessToken',
+  ]);
 }
 
 function fetchToken (callback) {
@@ -173,23 +140,8 @@ function fetchToken (callback) {
     'expiration'
   ], function (data) {
 
-    var accessToken = data.accessToken;
+    accessToken = data.accessToken;
     callback(accessToken);
-    // var refreshToken = data.refreshToken;
-    // var expiration = data.expiration;
-    // var now = Date.now();
-
-    // if (accessToken && expiration > now) {
-    //   console.log('token still valid');
-    //   callback(accessToken);
-    // }
-    // else if (refreshToken) {
-    //   console.log('token expired');
-    //   exchangeRefreshToken(refreshToken, callback);
-    // }
-    // else {
-    //   callback();
-    // }
   });
 }
 
@@ -286,33 +238,3 @@ function updateIcon (unreadCount) {
     }
   });
 }
-
-function clearCurrentTimeout () {
-
-  currentTimeout && clearTimeout(currentTimeout);
-}
-
-function setNextPoll () {
-
-  clearCurrentTimeout();
-  currentTimeout = setTimeout(poll, pollInterval);
-}
-
-function poll () {
-
-  clearCurrentTimeout();
-
-  fetchToken(function (accessToken) {
-
-    if (accessToken) {
-      console.log('using token:', accessToken);
-
-    }
-    else {
-      console.log('no token waiting ...');
-      setNextPoll();
-    }
-  });
-}
-
-poll();
