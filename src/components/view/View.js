@@ -53,7 +53,7 @@ var View = React.createClass({
         subview = <Stats {...props} onBack={self.onClickBack}/>;
         break;
       default:
-        subview = <Details {...props}/>;
+        subview = <Details {...props} />;
     }
 
     return (

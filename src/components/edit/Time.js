@@ -6,10 +6,16 @@ var background = chrome.extension.getBackgroundPage();
 
 var Time = React.createClass({
 
+  'onClickNext': function () {
+
+    this.props.onDone();
+  },
+
   'render': function () {
 
+    var self = this;
     return (
-       <div className="time container">
+      <div className="time container">
         <div className="header time">
           <span className="pictogram-icon wundercon icon-reminder"></span>
           <h2 className="inline-block m0 mb1">When and at what time does this need to be completed?</h2>
@@ -23,7 +29,7 @@ var Time = React.createClass({
           </div>
           <div className="button-wrapper">
             <span className="pictogram-icon wundercon icon-back white"></span>
-            <button className="bg-blue left-align white next" onClick={self.onClickDone}>Next</button>
+            <button onClick={self.onClickNext} className="bg-blue left-align white next">Next</button>
           </div>
         </div>
       </div>

@@ -60,6 +60,16 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  'fetchTaskData': function () {
+
+    var self = this;
+    background.fetchTask(function (task) {
+      self.setProps({
+        'task': task
+      });
+    });
+  },
+
   'getInitialState': function () {
 
     return {};
@@ -71,10 +81,10 @@ var BrowserActionApp = React.createClass({
     var props = self.props;
     var state = self.state
     var loggedIn = props.loggedIn;
-    var taskDefined = props.taskID;
+    var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-      return <Edit {...props} {...state}/>;
+      return <Edit {...props} {...state} onComplete={self.fetchTaskData}/>;
     }
     else if (loggedIn && taskDefined) {
       return <View {...props} {...state}/>;

@@ -25,8 +25,8 @@ var Edit = React.createClass({
   },
 
   'onTimeDone': function () {
-
-    appActions.setDoneEditing();
+    // appActions.setDoneEditing();
+    this.props.onComplete();
   },
 
   'getInitialState': function () {
