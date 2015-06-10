@@ -157,11 +157,19 @@ function fetchTask (callback) {
 
   storage.get(['taskID'], function (data) {
     var taskID = data.taskID;
+
     if (!taskID) {
-      taskID = '';
+      callback('');
+      return;
     }
 
-    callback(taskID);
+    getService('tasks').getID(taskID)
+      .done(function (taskData, statusCode) {
+        callback(taskData);
+      })
+      .fail(function (resp, code) {
+        console.log(errrr)
+      });
   });
 }
 

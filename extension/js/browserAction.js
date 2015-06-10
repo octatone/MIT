@@ -22839,10 +22839,13 @@ var BrowserActionApp = React.createClass({
       for (var key in changes) {
         var storageChange = changes[key];
         console.log("Storage key \"%s\" in namespace \"%s\" changed. " + "Old value was \"%s\", new value is \"%s\".", key, namespace, storageChange.oldValue, storageChange.newValue);
+<<<<<<< HEAD
       }
 
       if (changes.accessToken) {
         self.onChangeAccessToken(changes.accessToken.newValue);
+=======
+>>>>>>> view view now renders with a task
       }
     });
 
@@ -22873,6 +22876,16 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  fetchTaskData: function fetchTaskData() {
+
+    var self = this;
+    background.fetchTask(function (task) {
+      self.setProps({
+        task: task
+      });
+    });
+  },
+
   getInitialState: function getInitialState() {
 
     return {};
@@ -22887,8 +22900,15 @@ var BrowserActionApp = React.createClass({
     var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
+<<<<<<< HEAD
       return React.createElement(Edit, _extends({}, props, state));
     } else if (loggedIn && taskDefined) {} else {
+=======
+      return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
+    } else if (loggedIn && taskDefined) {
+      return React.createElement(View, _extends({}, props, state));
+    } else {
+>>>>>>> view view now renders with a task
       return React.createElement(Login, null);
     }
   }
@@ -22974,8 +22994,8 @@ var Edit = React.createClass({
   },
 
   onTimeDone: function onTimeDone() {
-
-    appActions.setDoneEditing();
+    // appActions.setDoneEditing();
+    this.props.onComplete();
   },
 
   getInitialState: function getInitialState() {
@@ -23379,8 +23399,14 @@ var background = chrome.extension.getBackgroundPage();
 var Time = React.createClass({
   displayName: "Time",
 
+  onClickNext: function onClickNext() {
+
+    this.props.onDone();
+  },
+
   render: function render() {
 
+    var self = this;
     return React.createElement(
       "div",
       { className: "time container" },
@@ -23420,7 +23446,11 @@ var Time = React.createClass({
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
+<<<<<<< HEAD
             { className: "bg-blue left-align white next" },
+=======
+            { onClick: self.onClickNext, className: "bg-blue left-align white next" },
+>>>>>>> view view now renders with a task
             "Next"
           )
         )
@@ -23450,10 +23480,20 @@ function renderApp(lists, accessToken) {
     loggedIn: !!accessToken
   });
 
+<<<<<<< HEAD
   React.render(browserActionApp, mountNode);
 }
 
 background.fetchToken(function (accessToken) {
+=======
+    background.fetchTask(function (task) {
+      console.log(task);
+      var browserActionApp = new BrowserActionApp({
+        lists: lists || [],
+        loggedIn: !!accessToken,
+        task: task || undefined
+      });
+>>>>>>> view view now renders with a task
 
   if (accessToken) {
     background.fetchLists().always(function (lists) {
