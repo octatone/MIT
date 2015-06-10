@@ -22919,11 +22919,22 @@ var Login = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "login" },
+      { className: "login container" },
       React.createElement(
-        "button",
-        { onClick: this.login },
-        "Login"
+        "div",
+        { className: "center py4" },
+        React.createElement("img", { src: "../icons/clock.png", width: "150px" })
+      ),
+      React.createElement(
+        "div",
+        { className: "center pb3" },
+        React.createElement(
+          "button",
+          {
+            className: "button bg-green white",
+            onClick: this.login },
+          "Login"
+        )
       )
     );
   }
