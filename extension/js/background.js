@@ -193,6 +193,19 @@ function fetchToken (callback) {
   });
 }
 
+function fetchTask (callback) {
+
+  storage.get(['taskID'], function (data) {
+    var taskID = data.taskID;
+    if (!taskID) {
+      taskID = '';
+    }
+
+    callback(taskID);
+  });
+}
+
+
 function getService (service) {
 
   var options = {

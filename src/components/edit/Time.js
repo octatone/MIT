@@ -23,7 +23,7 @@ var Time = React.createClass({
           </div>
           <div className="button-wrapper">
             <span className="pictogram-icon wundercon icon-back white"></span>
-            <button className="bg-blue left-align white next">Next</button>
+            <button className="bg-blue left-align white next" onClick={self.onClickDone}>Next</button>
           </div>
         </div>
       </div>

@@ -12,11 +12,15 @@ background.fetchToken(function (accessToken) {
 
   background.fetchLists().always(function (lists) {
 
-    var browserActionApp = new BrowserActionApp({
-      'lists': lists || [],
-      'loggedIn': !!accessToken
-    });
+    background.fetchTask(function (task) {
 
-    React.render(browserActionApp, mountNode);
+      var browserActionApp = new BrowserActionApp({
+        'lists': lists || [],
+        'loggedIn': !!accessToken,
+        'taskID': task
+      });
+
+      React.render(browserActionApp, mountNode);
+    });
   });
 });
