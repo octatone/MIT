@@ -23422,12 +23422,69 @@ var background = chrome.extension.getBackgroundPage();
 var Details = React.createClass({
   displayName: "Details",
 
+  renderTask: function renderTask() {
+    return "";
+  },
+
+  fetchSubtasks: function fetchSubtasks(task) {
+
+    var self = this;
+    background.fetchSubtasks(task.id).always(function (subTasks) {
+      console.log(subTasks);
+
+      subTasks = subTasks || [];
+      self.setState({
+        subTasks: subTasks });
+    });
+  },
+
+  renderSubtasks: function renderSubtasks() {
+    return this.props.subTasks && this.props.subTasks.map(function (subtask) {
+      return React.createElement(
+        "li",
+        { key: subtask.id, value: subtask.id },
+        subtask.title
+      );
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    console.log(task);
+    if (task) {
+      self.fetchSubtasks(task);
+    }
+  },
+
   render: function render() {
+
+    var self = this;
+    var task = self.props.task;
+    var renderedSubtasks = self.renderSubtasks();
 
     return React.createElement(
       "div",
-      { className: "details container" },
-      "hi"
+      { className: "details  container" },
+      React.createElement(
+        "div",
+        { className: "header details" },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox white" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          task.title
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement(
+          "ul",
+          null,
+          renderedSubtasks
+        )
+      )
     );
   }
 });
@@ -23570,7 +23627,6 @@ background.fetchToken(function (accessToken) {
   background.fetchLists().always(function (lists) {
 
     background.fetchTask(function (task) {
-      console.log(task);
       var browserActionApp = new BrowserActionApp({
         lists: lists || [],
         loggedIn: !!accessToken,

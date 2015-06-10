@@ -13,7 +13,6 @@ background.fetchToken(function (accessToken) {
   background.fetchLists().always(function (lists) {
 
     background.fetchTask(function (task) {
-      console.log(task)
       var browserActionApp = new BrowserActionApp({
         'lists': lists || [],
         'loggedIn': !!accessToken,

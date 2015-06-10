@@ -272,6 +272,12 @@ function createSubtask (subtaskTitle, taskID) {
   });
 }
 
+function fetchSubtasks (taskID) {
+
+  console.log(taskID)
+  return getService('subtasks').forTask(taskID);
+}
+
 function createNotification (data) {
 
   // chrome.notifications.create(
