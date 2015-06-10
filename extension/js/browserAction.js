@@ -23374,6 +23374,7 @@ var Time = React.createClass({
           "div",
           { className: "fake-input mt1 mb1" },
           React.createElement("input", { type: "date", className: "due-date inline-block half-width" }),
+          React.createElement("span", { className: "blocker" }),
           React.createElement("input", { type: "time", className: "due-date inline-block " })
         ),
         React.createElement(
