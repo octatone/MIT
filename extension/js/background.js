@@ -243,6 +243,14 @@ function createTask (taskTitle, listID) {
   });
 }
 
+function createSubtask (subtaskTitle, taskID) {
+
+  return getService('subtasks').create({
+    'title': subtaskTitle,
+    'task_id': taskID
+  });
+}
+
 function createNotification (data) {
 
   // chrome.notifications.create(

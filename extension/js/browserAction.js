@@ -22781,15 +22781,22 @@ module.exports = {
 
   createTaskAndSetTaskID: function createTaskAndSetTaskID(taskTitle, listID) {
 
-    console.info("createTaskAndSetTaskID", taskTitle, listID);
     var self = this;
     background.createTask(taskTitle, listID).done(function (task) {
 
-      console.info("created task", task.id);
       self.setTaskID(task.id);
     }).fail(function () {
 
       console.error(arguments);
+    });
+  },
+
+  createSteps: function createSteps(stepTitles, taskID) {
+
+    var self = this;
+    stepTitles.forEach(function (title) {
+
+      background.createSubtask(title, taskID);
     });
   }
 };
@@ -22797,6 +22804,8 @@ module.exports = {
 
 },{"../stores/applicationState":189}],179:[function(require,module,exports){
 "use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var React = require("react/addons");
 var applicationState = require("../stores/applicationState");
@@ -22814,6 +22823,11 @@ var BrowserActionApp = React.createClass({
   bindToApplicationState: function bindToApplicationState() {
 
     var self = this;
+    self.bindTo(applicationState, "change", function () {
+
+      var state = applicationState.getAll();
+      self.setState(state);
+    });
   },
 
   bindToStorage: function bindToStorage() {
@@ -22843,14 +22857,21 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  getInitialState: function getInitialState() {
+
+    return {};
+  },
+
   render: function render() {
 
-    var props = this.props;
+    var self = this;
+    var props = self.props;
+    var state = self.state;
     var loggedIn = props.loggedIn;
-    var taskDefined = props.taskID;
+    var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-      return React.createElement(Edit, props);
+      return React.createElement(Edit, _extends({}, props, state));
     } else if (loggedIn && taskDefined) {} else {
       return React.createElement(Login, null);
     }
@@ -22972,28 +22993,94 @@ module.exports = Edit;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var actions = require("../../actions/appActions");
 
 var Steps = React.createClass({
   displayName: "Steps",
 
   onClickNext: function onClickNext() {
 
-    this.props.onDone();
+    var self = this;
+    var steps = self.state.steps;
+    if (steps && steps.length) {
+      actions.createSteps(steps, self.props.taskID);
+    }
+    self.props.onDone();
   },
 
-  keydown: function keydown(ev) {
-    if (ev.which === 13) {}
+  addStep: function addStep() {
+
+    var self = this;
+    var state = self.state;
+    var step = state.stepTitle;
+    if (step && step.length) {
+      var newSteps = state.steps.slice();
+      newSteps.push(step);
+      self.setState({
+        steps: newSteps,
+        stepTitle: undefined
+      });
+    }
+  },
+
+  onStepKeydown: function onStepKeydown(e) {
+
+    if (e.which === 13) {
+      this.addStep();
+    }
+  },
+
+  onStepChange: function onStepChange(e) {
+
+    var title = e.target.value;
+    this.setState({
+      stepTitle: title
+    });
+  },
+
+  onAddStepClick: function onAddStepClick() {
+
+    this.addStep();
+  },
+
+  deleteStep: function deleteStep(index) {
+
+    var self = this;
+    var state = self.state;
+    state.steps.splice(index, 1);
+    self.setState({
+      steps: state.steps,
+      stepTitle: undefined
+    });
   },
 
   renderSteps: function renderSteps() {
 
-    return React.createElement("li", null);
+    var self = this;
+    return this.state.steps.map(function (step, index) {
+      return React.createElement(
+        "li",
+        { key: step, className: "num-list" },
+        step,
+        " ",
+        React.createElement("a", { className: "right pictogram-icon wundercon icon-x-active delete-icon light-gray", onClick: self.deleteStep.bind(self, index) })
+      );
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      steps: [],
+      stepTitle: undefined
+    };
   },
 
   render: function render() {
 
     var self = this;
     var steps = self.renderSteps();
+    var stepTitle = self.state.stepTitle;
 
     return React.createElement(
       "div",
@@ -23005,7 +23092,7 @@ var Steps = React.createClass({
         React.createElement(
           "h2",
           { className: "inline-block m0 mb1" },
-          "What steps are needed to get this done?"
+          "What are the steps needed to get this done?"
         )
       ),
       React.createElement(
@@ -23016,15 +23103,22 @@ var Steps = React.createClass({
           { className: "subheading" },
           "Break down this task into small pieces"
         ),
-        React.createElement("input", { className: "step-input block inline-block field-light px1 mt1 mb1", placeholder: "Add a step", onKeyDown: this.keydown }),
+        React.createElement("input", {
+          value: stepTitle,
+          className: "step-input block inline-block field-light px1 mt1 mb1",
+          placeholder: "Add a step",
+          onKeyDown: self.onStepKeydown,
+          onChange: self.onStepChange }),
         React.createElement(
           "button",
-          { className: "ml1 button button-outline yellow left-align inline-block add " },
+          {
+            className: "ml1 button button-outline yellow left-align inline-block add",
+            onClick: self.onAddStepClick },
           "Add"
         ),
         React.createElement(
           "ul",
-          { className: "list-reset" },
+          { className: "list-reset steps-list" },
           steps
         ),
         React.createElement(
@@ -23051,10 +23145,8 @@ var Steps = React.createClass({
 
 module.exports = Steps;
 
-// add a subtask
 
-
-},{"react/addons":6}],183:[function(require,module,exports){
+},{"../../actions/appActions":178,"react/addons":6}],183:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -23292,6 +23384,7 @@ var Time = React.createClass({
           "div",
           { className: "fake-input mt1 mb1" },
           React.createElement("input", { type: "date", className: "due-date inline-block half-width" }),
+          React.createElement("span", { className: "blocker" }),
           React.createElement("input", { type: "time", className: "due-date inline-block " })
         ),
         React.createElement(

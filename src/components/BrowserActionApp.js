@@ -17,8 +17,11 @@ var BrowserActionApp = React.createClass({
   'bindToApplicationState': function () {
 
     var self = this;
+    self.bindTo(applicationState, 'change', function () {
 
-
+      var state = applicationState.getAll();
+      self.setState(state);
+    });
   },
 
   'bindToStorage': function () {
@@ -56,14 +59,21 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  'getInitialState': function () {
+
+    return {};
+  },
+
   'render': function () {
 
-    var props = this.props;
+    var self = this;
+    var props = self.props;
+    var state = self.state
     var loggedIn = props.loggedIn;
-    var taskDefined = props.taskID;
+    var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-      return <Edit {...props}/>;
+      return <Edit {...props} {...state}/>;
     }
     else if (loggedIn && taskDefined) {
       // view details

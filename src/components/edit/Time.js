@@ -18,6 +18,7 @@ var Time = React.createClass({
           <h4 className="subheading">Pick a date and time that is practical</h4>
           <div className="fake-input mt1 mb1">
             <input type="date" className="due-date inline-block half-width" />
+            <span className="blocker"></span>
             <input type="time" className="due-date inline-block " />
           </div>
           <div className="button-wrapper">
