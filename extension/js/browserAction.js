@@ -23466,6 +23466,208 @@ module.exports = Time;
 "use strict";
 
 var React = require("react/addons");
+<<<<<<< HEAD
+=======
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Details = React.createClass({
+  displayName: "Details",
+
+  renderTask: function renderTask() {
+    return "";
+  },
+
+  fetchSubtasks: function fetchSubtasks(task) {
+
+    var self = this;
+    background.fetchSubtasks(task.id).always(function (subTasks) {
+      console.log(subTasks);
+
+      subTasks = subTasks || [];
+      self.setState({
+        subTasks: subTasks });
+    });
+  },
+
+  renderSubtasks: function renderSubtasks() {
+    return this.props.subTasks && this.props.subTasks.map(function (subtask) {
+      return React.createElement(
+        "li",
+        { key: subtask.id, value: subtask.id },
+        subtask.title
+      );
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    console.log(task);
+    if (task) {
+      self.fetchSubtasks(task);
+    }
+  },
+
+  render: function render() {
+
+    var self = this;
+    var task = self.props.task;
+    var renderedSubtasks = self.renderSubtasks();
+
+    return React.createElement(
+      "div",
+      { className: "details  container" },
+      React.createElement(
+        "div",
+        { className: "header details" },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox white" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1" },
+          task.title
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement(
+          "ul",
+          null,
+          renderedSubtasks
+        )
+      )
+    );
+  }
+});
+
+module.exports = Details;
+
+
+},{"react/addons":6}],186:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Options = React.createClass({
+  displayName: "Options",
+
+  render: function render() {
+
+    return React.createElement(
+      "div",
+      { className: "options container" },
+      "hi"
+    );
+  }
+});
+
+module.exports = Options;
+
+
+},{"react/addons":6}],187:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Stats = React.createClass({
+  displayName: "Stats",
+
+  render: function render() {
+
+    return React.createElement(
+      "div",
+      { className: "stats container" },
+      "hi"
+    );
+  }
+});
+
+module.exports = Stats;
+
+
+},{"react/addons":6}],188:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var React = require("react/addons");
+var Options = require("./Options");
+var Stats = require("./Stats");
+var Details = require("./Details");
+var actions = require("../../actions/appActions");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var View = React.createClass({
+  displayName: "View",
+
+  onClickBack: function onClickBack() {
+
+    this.setState({
+      subview: "details"
+    });
+  },
+
+  onClickOptions: function onClickOptions() {
+
+    this.setState({
+      subview: "options"
+    });
+  },
+
+  onClickStats: function onClickStats() {
+
+    this.setState({
+      subview: "stats"
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      subview: "details"
+    };
+  },
+
+  render: function render() {
+
+    var self = this;
+    var props = this.props;
+    var subviewState = self.state.subview;
+    var subview;
+
+    switch (subviewState) {
+      case "options":
+        subview = React.createElement(Options, _extends({}, props, { onBack: self.onClickBack }));
+        break;
+      case "stats":
+        subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
+        break;
+      default:
+        subview = React.createElement(Details, props);
+    }
+
+    return React.createElement(
+      "div",
+      { className: "view" },
+      subview
+    );
+  }
+});
+
+module.exports = View;
+
+
+},{"../../actions/appActions":178,"./Details":185,"./Options":186,"./Stats":187,"react/addons":6}],189:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
+>>>>>>> sort of working subtask fetching
 var applicationState = require("./stores/applicationState");
 var BrowserActionApp = React.createFactory(require("./components/BrowserActionApp"));
 var mountNode = document.getElementById("react-main-mount");
@@ -23487,7 +23689,6 @@ function renderApp(lists, accessToken) {
 background.fetchToken(function (accessToken) {
 =======
     background.fetchTask(function (task) {
-      console.log(task);
       var browserActionApp = new BrowserActionApp({
         lists: lists || [],
         loggedIn: !!accessToken,
