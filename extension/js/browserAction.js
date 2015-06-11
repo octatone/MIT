@@ -23025,12 +23025,22 @@ var Login = React.createClass({
       { className: "login container" },
       React.createElement(
         "div",
-        { className: "center py4" },
+        { className: "center pt3" },
         React.createElement("img", { src: "../icons/clock.png", width: "150px" })
       ),
       React.createElement(
+        "h4",
+        { className: "center mb0 bold" },
+        "The Most Important Thing"
+      ),
+      React.createElement(
+        "h5",
+        { className: "center m0" },
+        "powered by Wunderlist"
+      ),
+      React.createElement(
         "div",
-        { className: "center pb3" },
+        { className: "center py3" },
         React.createElement(
           "button",
           {

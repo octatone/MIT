@@ -17,11 +17,18 @@ var Login = React.createClass({
     return (
       <div className="login container">
 
-        <div className="center py4">
+        <div className="center pt3">
           <img src="../icons/clock.png" width="150px"/>
         </div>
 
-        <div className="center pb3">
+        <h4 className="center mb0 bold">
+          The Most Important Thing
+        </h4>
+        <h5 className="center m0">
+          powered by Wunderlist
+        </h5>
+
+        <div className="center py3">
           <button
             className="button bg-green white"
             onClick={this.login}>
