@@ -15,8 +15,19 @@ var Login = React.createClass({
   'render': function () {
 
     return (
-      <div className="login">
-        <button onClick={this.login}>Login</button>
+      <div className="login container">
+
+        <div className="center py4">
+          <img src="../icons/clock.png" width="150px"/>
+        </div>
+
+        <div className="center pb3">
+          <button
+            className="button bg-green white"
+            onClick={this.login}>
+              Login
+          </button>
+        </div>
       </div>
     );
   }

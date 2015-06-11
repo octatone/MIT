@@ -96,7 +96,7 @@ var Steps = React.createClass({
 
         <div className="content-wrapper">
           <h4 className="subheading">
-            Break down this task into small pieces
+            Break this to do down into small steps
           </h4>
 
           <input

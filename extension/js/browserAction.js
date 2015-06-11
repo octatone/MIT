@@ -22840,6 +22840,10 @@ var BrowserActionApp = React.createClass({
         var storageChange = changes[key];
         console.log("Storage key \"%s\" in namespace \"%s\" changed. " + "Old value was \"%s\", new value is \"%s\".", key, namespace, storageChange.oldValue, storageChange.newValue);
       }
+
+      if (changes.accessToken) {
+        self.onChangeAccessToken(changes.accessToken.newValue);
+      }
     });
 
     chrome.runtime.onMessage.addListener(function (request, sender) {
@@ -22847,6 +22851,18 @@ var BrowserActionApp = React.createClass({
       console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
 
       if (request.notifications === "update") {}
+    });
+  },
+
+  onChangeAccessToken: function onChangeAccessToken(accessToken) {
+
+    var self = this;
+    background.fetchLists().always(function (lists) {
+
+      self.setProps({
+        lists: lists || [],
+        loggedIn: !!accessToken
+      });
     });
   },
 
@@ -22903,11 +22919,22 @@ var Login = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "login" },
+      { className: "login container" },
       React.createElement(
-        "button",
-        { onClick: this.login },
-        "Login"
+        "div",
+        { className: "center py4" },
+        React.createElement("img", { src: "../icons/clock.png", width: "150px" })
+      ),
+      React.createElement(
+        "div",
+        { className: "center pb3" },
+        React.createElement(
+          "button",
+          {
+            className: "button bg-green white",
+            onClick: this.login },
+          "Login"
+        )
       )
     );
   }
@@ -23101,7 +23128,7 @@ var Steps = React.createClass({
         React.createElement(
           "h4",
           { className: "subheading" },
-          "Break down this task into small pieces"
+          "Break this to do down into small steps"
         ),
         React.createElement("input", {
           value: stepTitle,
@@ -23289,7 +23316,7 @@ var Task = React.createClass({
         React.createElement(
           "h4",
           { className: "subheading" },
-          "Choose a list"
+          "Choose a list ..."
         ),
         React.createElement(
           "select",
@@ -23301,8 +23328,8 @@ var Task = React.createClass({
         ),
         React.createElement(
           "h4",
-          { className: "subheading" },
-          "Choose an existing task"
+          { className: "subheading center" },
+          "... and an existing to do ..."
         ),
         React.createElement(
           "select",
@@ -23314,21 +23341,16 @@ var Task = React.createClass({
         ),
         React.createElement(
           "h4",
-          { className: "subheading" },
-          "Or create a new one"
+          { className: "subheading right" },
+          "... or add something new"
         ),
         React.createElement("input", {
           className: "task block fit-width field-light px1",
-          placeholder: "Input a thing you want to get done",
+          placeholder: "Add the most important thing",
           onChange: self.onTaskInputChange }),
         React.createElement(
           "div",
           { className: "button-wrapper" },
-          React.createElement(
-            "button",
-            { className: "left ml1 button button-outline blue" },
-            "Back"
-          ),
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
@@ -23421,17 +23443,26 @@ var mountNode = document.getElementById("react-main-mount");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
+function renderApp(lists, accessToken) {
+
+  var browserActionApp = new BrowserActionApp({
+    lists: lists || [],
+    loggedIn: !!accessToken
+  });
+
+  React.render(browserActionApp, mountNode);
+}
+
 background.fetchToken(function (accessToken) {
 
-  background.fetchLists().always(function (lists) {
+  if (accessToken) {
+    background.fetchLists().always(function (lists) {
 
-    var browserActionApp = new BrowserActionApp({
-      lists: lists || [],
-      loggedIn: !!accessToken
+      renderApp(lists, accessToken);
     });
-
-    React.render(browserActionApp, mountNode);
-  });
+  } else {
+    renderApp();
+  }
 });
 
 
