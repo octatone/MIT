@@ -70,10 +70,11 @@ var Details = React.createClass({
             {renderedSubtasks}
           </ul>
 
-          <div className="settings">
-
+          <div className="options">
+            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options"></a>
+            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options"></a>
+            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last"></a>
           </div>
-
         </div>
       </div>
     );

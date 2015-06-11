@@ -23553,7 +23553,13 @@ var Details = React.createClass({
           { className: "subtasks list-reset" },
           renderedSubtasks
         ),
-        React.createElement("div", { className: "settings" })
+        React.createElement(
+          "div",
+          { className: "options" },
+          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options" }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last" })
+        )
       )
     );
   }

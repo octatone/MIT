@@ -260,3 +260,18 @@ button.bg-blue.next {
   margin-top: 3px;
   cursor: pointer;
 }
+
+.options {
+  height: 20px;
+  margin-top: 20px;
+}
+
+.bottom-options {
+  text-align: center;
+  margin-left:-3px;
+  border-right: 1px solid #ccc;
+}
+
+.bottom-options.last {
+  border-right: none;
+}
