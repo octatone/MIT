@@ -23490,7 +23490,9 @@ var Task = React.createClass({
     var listOptions = self.renderListOptions();
     var taskOptions = self.renderTaskOptions();
     var hasTasks = !!(state.tasks && state.tasks.length);
-    var ready = !!(state.taskID || state.taskTitle);
+    var taskPicked = state.taskID && state.entryMode === "chooseExisting";
+    var taskEntered = state.taskTitle && state.entryMode === "createNew";
+    var ready = !!(taskPicked || taskEntered);
 
     var entryContainerClasses = classNames({
       "display-none": !!state.entryMode
@@ -23657,6 +23659,9 @@ var Time = React.createClass({
   render: function render() {
 
     var self = this;
+    var state = self.state;
+    var ready = !!(state.date && state.time);
+
     return React.createElement(
       "div",
       { className: "time container" },
@@ -23705,6 +23710,7 @@ var Time = React.createClass({
           React.createElement(
             "button",
             {
+              disabled: !ready,
               onClick: self.onClickNext,
               className: "bg-blue left-align white next" },
             "Next"

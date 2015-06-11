@@ -41,6 +41,9 @@ var Time = React.createClass({
   'render': function () {
 
     var self = this;
+    var state = self.state;
+    var ready = !!(state.date && state.time);
+
     return (
       <div className="time container">
         <div className="header time">
@@ -68,6 +71,7 @@ var Time = React.createClass({
             </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
+              disabled={!ready}
               onClick={self.onClickNext}
               className="bg-blue left-align white next">
                 Next
