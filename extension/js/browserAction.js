@@ -26175,7 +26175,7 @@ var BrowserActionApp = React.createClass({
     var state = self.state;
     var loggedIn = props.loggedIn;
     var taskDefined = props.task;
-
+    console.log(taskDefined);
     if (loggedIn && !taskDefined) {
       return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else if (loggedIn && taskDefined) {
@@ -27113,10 +27113,29 @@ var Details = React.createClass({
     return "";
   },
 
-  fetchSubtasks: function fetchSubtasks(task) {
+  completeMainTask: function completeMainTask() {
 
     var self = this;
-    background.fetchSubtasks(task.id).always(function (subTasks) {
+    background.toggleTaskComplete(self.props.task, true).always(function () {
+      background.fetchTask(function () {
+        self.state.subTasks.map(function (subtask) {
+          self.toggleSubtask(subtask, true);
+        });
+      });
+    });
+  },
+
+  toggleSubtask: function toggleSubtask(subtask, override) {
+
+    var self = this;
+    var shouldComplete = override === true ? true : !subtask.completed;
+    background.toggleSubtaskComplete(subtask, shouldComplete).always(self.fetchSubtasks.bind(self));
+  },
+
+  fetchSubtasks: function fetchSubtasks() {
+
+    var self = this;
+    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
       subTasks = subTasks || [];
       self.setState({
         subTasks: subTasks });
@@ -27125,11 +27144,15 @@ var Details = React.createClass({
 
   renderSubtasks: function renderSubtasks() {
 
-    return this.state.subTasks.map(function (subtask) {
+    var self = this;
+    return self.state.subTasks.map(function (subtask) {
+      var classList = "pictogram-icon wundercon gray mr1";
+      classList += subtask.completed ? " icon-checkbox-filled" : " icon-checkbox";
+
       return React.createElement(
         "li",
         { key: subtask.id, value: subtask.id },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
+        React.createElement("a", { className: classList, onClick: self.toggleSubtask.bind(self, subtask) }),
         subtask.title
       );
     });
@@ -27140,7 +27163,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     if (task) {
-      self.fetchSubtasks(task);
+      self.fetchSubtasks();
     }
   },
 
@@ -27156,11 +27179,9 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
-    // get remaining time
-    // separate main task from steps
-    // add links
-    // add editing
-
+    var classList = "pictogram-icon wundercon gray mr1";
+    classList += task.completed ? " icon-checkbox-filled" : " icon-checkbox";
+    console.log(classList);
     return React.createElement(
       "div",
       { className: "details container" },
@@ -27177,7 +27198,7 @@ var Details = React.createClass({
       React.createElement(
         "div",
         { className: "content-wrapper" },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
+        React.createElement("a", { className: classList, onClick: self.completeMainTask }),
         React.createElement(
           "h2",
           { className: "inline-block m0 mb1 main-task" },

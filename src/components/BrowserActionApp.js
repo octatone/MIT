@@ -98,7 +98,7 @@ var BrowserActionApp = React.createClass({
     var state = self.state;
     var loggedIn = props.loggedIn;
     var taskDefined = props.task;
-
+    console.log(taskDefined)
     if (loggedIn && !taskDefined) {
       return <Edit {...props} {...state} onComplete={self.fetchTaskData}/>;
     }

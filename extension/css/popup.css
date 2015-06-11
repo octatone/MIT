@@ -277,7 +277,7 @@ button.bg-blue.next {
   font-size: 18px
 }
 
-.icon-checkbox {
+.icon-checkbox, .icon-checkbox-filled {
   vertical-align: top;
   display: inline-block;
   margin-top: 3px;
@@ -293,6 +293,7 @@ button.bg-blue.next {
   text-align: center;
   margin-left:-3px;
   border-right: 1px solid #ccc;
+  cursor: pointer;
 }
 
 .bottom-options.last {
