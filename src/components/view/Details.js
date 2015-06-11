@@ -10,6 +10,19 @@ var Details = React.createClass({
     return '';
   },
 
+  'onClickStats': function () {
+
+  },
+
+  'onClickSettings': function () {
+
+    console.log('settings clicked')
+  },
+
+  'onClickHelp': function () {
+
+  },
+
   'completeMainTask': function () {
 
     var self = this;
@@ -77,7 +90,7 @@ var Details = React.createClass({
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
     var classList = 'pictogram-icon wundercon gray mr1';
     classList += (task.completed ? ' icon-checkbox-filled': ' icon-checkbox');
-    console.log(classList)
+
     return (
       <div className="details container">
         <div className="header details">
@@ -92,9 +105,9 @@ var Details = React.createClass({
           </ul>
 
           <div className="options">
-            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options"></a>
-            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options"></a>
-            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last"></a>
+            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
+            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickSettings}></a>
+            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
           </div>
         </div>
       </div>

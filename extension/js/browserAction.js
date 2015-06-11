@@ -27113,6 +27113,15 @@ var Details = React.createClass({
     return "";
   },
 
+  onClickStats: function onClickStats() {},
+
+  onClickSettings: function onClickSettings() {
+
+    console.log("settings clicked");
+  },
+
+  onClickHelp: function onClickHelp() {},
+
   completeMainTask: function completeMainTask() {
 
     var self = this;
@@ -27181,7 +27190,7 @@ var Details = React.createClass({
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
     var classList = "pictogram-icon wundercon gray mr1";
     classList += task.completed ? " icon-checkbox-filled" : " icon-checkbox";
-    console.log(classList);
+
     return React.createElement(
       "div",
       { className: "details container" },
@@ -27212,9 +27221,9 @@ var Details = React.createClass({
         React.createElement(
           "div",
           { className: "options" },
-          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options" }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last" })
+          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickSettings }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
         )
       )
     );
