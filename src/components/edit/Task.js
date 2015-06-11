@@ -117,17 +117,21 @@ var Task = React.createClass({
       <div className="task-choice container">
         <div className="header tasks">
           <span className="pictogram-icon wundercon icon-star-filled"></span>
-          <h2 className="inline-block m0 mb1">What is the most important thing to get done?</h2>
+          <h2 className="inline-block m0 mb1">
+            What is the most important thing to get done?
+          </h2>
         </div>
         <div className="content-wrapper">
-          <h4 className="subheading">Choose a list</h4>
+          <h4 className="subheading">Choose a list ...</h4>
           <select
             onChange={this.onListSelectChange}
             className="lists block px1 full-width"
           >
             {listOptions}
           </select>
-          <h4 className="subheading">Choose an existing task</h4>
+          <h4 className="subheading center">
+            ... and an existing to do ...
+          </h4>
           <select
             onChange={self.onTaskInputChange}
             className="tasks block px1 full-width"
@@ -135,14 +139,15 @@ var Task = React.createClass({
             {taskOptions}
           </select>
 
-          <h4 className="subheading">Or create a new one</h4>
+          <h4 className="subheading right">
+            ... or add something new
+          </h4>
           <input
             className="task block fit-width field-light px1"
-            placeholder="Input a thing you want to get done"
+            placeholder="Add the most important thing"
             onChange={self.onTaskInputChange}/>
 
           <div className="button-wrapper">
-            <button className="left ml1 button button-outline blue">Back</button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
               className="bg-blue left-align white next"

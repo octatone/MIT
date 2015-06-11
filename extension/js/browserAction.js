@@ -23128,7 +23128,7 @@ var Steps = React.createClass({
         React.createElement(
           "h4",
           { className: "subheading" },
-          "Break down this task into small pieces"
+          "Break this to do down into small steps"
         ),
         React.createElement("input", {
           value: stepTitle,
@@ -23316,7 +23316,7 @@ var Task = React.createClass({
         React.createElement(
           "h4",
           { className: "subheading" },
-          "Choose a list"
+          "Choose a list ..."
         ),
         React.createElement(
           "select",
@@ -23328,8 +23328,8 @@ var Task = React.createClass({
         ),
         React.createElement(
           "h4",
-          { className: "subheading" },
-          "Choose an existing task"
+          { className: "subheading center" },
+          "... and an existing to do ..."
         ),
         React.createElement(
           "select",
@@ -23341,21 +23341,16 @@ var Task = React.createClass({
         ),
         React.createElement(
           "h4",
-          { className: "subheading" },
-          "Or create a new one"
+          { className: "subheading right" },
+          "... or add something new"
         ),
         React.createElement("input", {
           className: "task block fit-width field-light px1",
-          placeholder: "Input a thing you want to get done",
+          placeholder: "Add the most important thing",
           onChange: self.onTaskInputChange }),
         React.createElement(
           "div",
           { className: "button-wrapper" },
-          React.createElement(
-            "button",
-            { className: "left ml1 button button-outline blue" },
-            "Back"
-          ),
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
