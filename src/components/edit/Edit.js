@@ -104,20 +104,40 @@ var Edit = React.createClass({
     var props = this.props;
     var subviewState = self.state.subview;
 
-    var taskClasses = classNames({
-      'display-none': subviewState !== 'task'
+    var isTimeVisible = subviewState === 'time';
+    var isStepsVisible = subviewState === 'steps';
+    var isTaskVisible = subviewState === 'task';
+
+    var editClasses = classNames(
+      'edit',
+      {
+        'step-2': isStepsVisible,
+        'step-3': isTimeVisible
     });
 
-    var stepsClasses = classNames({
-      'display-none': subviewState !== 'steps'
+    var taskClasses = classNames(
+      'inline-block',
+      {
+        'muted': !isTaskVisible,
+        'no-height': !isTaskVisible
     });
 
-    var timeClasses = classNames({
-      'display-none': subviewState !== 'time'
+    var stepsClasses = classNames(
+      'inline-block',
+      {
+        'muted': !isStepsVisible,
+        'no-height': !isStepsVisible
+    });
+
+    var timeClasses = classNames(
+      'inline-block',
+      {
+        'muted': !isTimeVisible,
+        'no-height': !isTimeVisible
     });
 
     return (
-      <div className="edit">
+      <div className={editClasses}>
         <div className={taskClasses}>
           <Task {...props} onDone={self.onTaskDone}/>
         </div>
