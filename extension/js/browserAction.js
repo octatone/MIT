@@ -23482,8 +23482,6 @@ var Details = React.createClass({
 
     var self = this;
     background.fetchSubtasks(task.id).always(function (subTasks) {
-      console.log(subTasks);
-
       subTasks = subTasks || [];
       self.setState({
         subTasks: subTasks });
@@ -23491,10 +23489,12 @@ var Details = React.createClass({
   },
 
   renderSubtasks: function renderSubtasks() {
-    return this.props.subTasks && this.props.subTasks.map(function (subtask) {
+
+    return this.state.subTasks.map(function (subtask) {
       return React.createElement(
         "li",
         { key: subtask.id, value: subtask.id },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
         subtask.title
       );
     });
@@ -23503,39 +23503,57 @@ var Details = React.createClass({
   componentDidMount: function componentDidMount() {
 
     var self = this;
-    console.log(task);
+    var task = self.props.task;
     if (task) {
       self.fetchSubtasks(task);
     }
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      subTasks: []
+    };
   },
 
   render: function render() {
 
     var self = this;
     var task = self.props.task;
-    var renderedSubtasks = self.renderSubtasks();
+    var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
+    // get remaining time
+    // separate main task from steps
+    // add links
+    // add editing
 
     return React.createElement(
       "div",
-      { className: "details  container" },
+      { className: "details container" },
       React.createElement(
         "div",
         { className: "header details" },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox white" }),
+        React.createElement("span", { className: "pictogram-icon wundercon icon-inbox" }),
         React.createElement(
           "h2",
-          { className: "inline-block m0 mb1" },
-          task.title
+          null,
+          "You have 3 days and 4 hours to get your task done."
         )
       ),
       React.createElement(
         "div",
         { className: "content-wrapper" },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1 main-task" },
+          task.title
+        ),
         React.createElement(
           "ul",
-          null,
+          { className: "subtasks list-reset" },
           renderedSubtasks
-        )
+        ),
+        React.createElement("div", { className: "settings" })
       )
     );
   }

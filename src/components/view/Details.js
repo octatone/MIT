@@ -14,8 +14,6 @@ var Details = React.createClass({
 
     var self = this;
     background.fetchSubtasks(task.id).always(function (subTasks) {
-      console.log(subTasks)
-
       subTasks = subTasks || [];
       self.setState({
         'subTasks': subTasks,
@@ -24,17 +22,28 @@ var Details = React.createClass({
   },
 
   'renderSubtasks': function () {
-    return this.props.subTasks && this.props.subTasks.map(function (subtask) {
-      return <li key={subtask.id} value={subtask.id}>{subtask.title}</li>;
+
+    return this.state.subTasks.map(function (subtask) {
+      return <li key={subtask.id} value={subtask.id}>
+                <a className="pictogram-icon wundercon icon-checkbox gray mr1"></a>
+                {subtask.title}
+             </li>;
     });
   },
 
   'componentDidMount': function () {
 
     var self = this;
-    console.log(task)
+    var task = self.props.task;
     if (task) {
       self.fetchSubtasks(task);
+    }
+  },
+
+  'getInitialState': function () {
+
+    return {
+      'subTasks': []
     }
   },
 
@@ -42,18 +51,29 @@ var Details = React.createClass({
 
     var self = this;
     var task = self.props.task;
-    var renderedSubtasks = self.renderSubtasks();
+    var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
+    // get remaining time
+    // separate main task from steps
+    // add links
+    // add editing
 
     return (
-      <div className="details  container">
+      <div className="details container">
         <div className="header details">
-          <a className="pictogram-icon wundercon icon-checkbox white"></a>
-          <h2 className="inline-block m0 mb1">{task.title}</h2>
+          <span className="pictogram-icon wundercon icon-inbox"></span>
+          <h2>You have 3 days and 4 hours to get your task done.</h2>
         </div>
         <div className="content-wrapper">
-          <ul>
-          {renderedSubtasks}
+          <a className="pictogram-icon wundercon icon-checkbox gray mr1"></a>
+          <h2 className="inline-block m0 mb1 main-task">{task.title}</h2>
+          <ul className="subtasks list-reset">
+            {renderedSubtasks}
           </ul>
+
+          <div className="settings">
+
+          </div>
+
         </div>
       </div>
     );
