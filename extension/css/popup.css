@@ -23,7 +23,7 @@ body {
   display: inline-block;
 }
 
-.header .wundercon.icon-star-filled {
+.header .wundercon.icon-star-filled, .header .icon-inbox {
   color: #2b88d9;
 }
 
@@ -35,7 +35,7 @@ body {
   color: #65B01B;
 }
 
-.header .wundercon {
+.header span.wundercon {
   position: absolute;
   z-index: 5;
   left: auto;
@@ -43,7 +43,7 @@ body {
   bottom: 10px;
 }
 
-.header .wundercon::before {
+.header span.wundercon::before {
   z-index: 1;
   text-align: center;
   width: 50px;
@@ -51,7 +51,7 @@ body {
   top: 80%;
 }
 
-.header .wundercon::after {
+.header span.wundercon::after {
   content: '';
   position: absolute;
   width: 50px;
@@ -67,7 +67,7 @@ body {
   background-color: #E6B035;
 }
 
-.header.tasks {
+.header.tasks, .header.details {
   background-color: #2b88d9;
 }
 
@@ -243,4 +243,35 @@ button.bg-blue.next {
 
 .fake-input input[type="date"] {
   width: 155px;
+}
+
+.subtasks {
+  border-top: 1px solid #ccc;
+  padding-top:10px;
+}
+
+.main-task {
+  font-size: 18px
+}
+
+.icon-checkbox {
+  vertical-align: top;
+  display: inline-block;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.options {
+  height: 20px;
+  margin-top: 20px;
+}
+
+.bottom-options {
+  text-align: center;
+  margin-left:-3px;
+  border-right: 1px solid #ccc;
+}
+
+.bottom-options.last {
+  border-right: none;
 }

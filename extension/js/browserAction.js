@@ -22802,7 +22802,7 @@ module.exports = {
 };
 
 
-},{"../stores/applicationState":189}],179:[function(require,module,exports){
+},{"../stores/applicationState":193}],179:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -22812,6 +22812,7 @@ var applicationState = require("../stores/applicationState");
 var bindableMixin = require("../mixins/bindable");
 var Login = require("./Login");
 var Edit = require("./edit/Edit");
+var View = require("./view/View");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
@@ -22873,6 +22874,16 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  fetchTaskData: function fetchTaskData() {
+
+    var self = this;
+    background.fetchTask(function (task) {
+      self.setProps({
+        task: task
+      });
+    });
+  },
+
   getInitialState: function getInitialState() {
 
     return {};
@@ -22887,8 +22898,10 @@ var BrowserActionApp = React.createClass({
     var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-      return React.createElement(Edit, _extends({}, props, state));
-    } else if (loggedIn && taskDefined) {} else {
+      return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
+    } else if (loggedIn && taskDefined) {
+      return React.createElement(View, _extends({}, props, state));
+    } else {
       return React.createElement(Login, null);
     }
   }
@@ -22896,10 +22909,8 @@ var BrowserActionApp = React.createClass({
 
 module.exports = BrowserActionApp;
 
-// view details
 
-
-},{"../mixins/bindable":186,"../stores/applicationState":189,"./Login":180,"./edit/Edit":181,"react/addons":6}],180:[function(require,module,exports){
+},{"../mixins/bindable":190,"../stores/applicationState":193,"./Login":180,"./edit/Edit":181,"./view/View":188,"react/addons":6}],180:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -22974,8 +22985,8 @@ var Edit = React.createClass({
   },
 
   onTimeDone: function onTimeDone() {
-
-    appActions.setDoneEditing();
+    // appActions.setDoneEditing();
+    this.props.onComplete();
   },
 
   getInitialState: function getInitialState() {
@@ -23379,8 +23390,14 @@ var background = chrome.extension.getBackgroundPage();
 var Time = React.createClass({
   displayName: "Time",
 
+  onClickNext: function onClickNext() {
+
+    this.props.onDone();
+  },
+
   render: function render() {
 
+    var self = this;
     return React.createElement(
       "div",
       { className: "time container" },
@@ -23420,7 +23437,7 @@ var Time = React.createClass({
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
-            { className: "bg-blue left-align white next" },
+            { onClick: self.onClickNext, className: "bg-blue left-align white next" },
             "Next"
           )
         )
@@ -23436,6 +23453,229 @@ module.exports = Time;
 "use strict";
 
 var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Details = React.createClass({
+  displayName: "Details",
+
+  renderTask: function renderTask() {
+    return "";
+  },
+
+  fetchSubtasks: function fetchSubtasks(task) {
+
+    var self = this;
+    background.fetchSubtasks(task.id).always(function (subTasks) {
+      subTasks = subTasks || [];
+      self.setState({
+        subTasks: subTasks });
+    });
+  },
+
+  renderSubtasks: function renderSubtasks() {
+
+    return this.state.subTasks.map(function (subtask) {
+      return React.createElement(
+        "li",
+        { key: subtask.id, value: subtask.id },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
+        subtask.title
+      );
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    var task = self.props.task;
+    if (task) {
+      self.fetchSubtasks(task);
+    }
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      subTasks: []
+    };
+  },
+
+  render: function render() {
+
+    var self = this;
+    var task = self.props.task;
+    var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
+    // get remaining time
+    // separate main task from steps
+    // add links
+    // add editing
+
+    return React.createElement(
+      "div",
+      { className: "details container" },
+      React.createElement(
+        "div",
+        { className: "header details" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-inbox" }),
+        React.createElement(
+          "h2",
+          null,
+          "You have 3 days and 4 hours to get your task done."
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
+        React.createElement(
+          "h2",
+          { className: "inline-block m0 mb1 main-task" },
+          task.title
+        ),
+        React.createElement(
+          "ul",
+          { className: "subtasks list-reset" },
+          renderedSubtasks
+        ),
+        React.createElement(
+          "div",
+          { className: "options" },
+          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options" }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last" })
+        )
+      )
+    );
+  }
+});
+
+module.exports = Details;
+
+
+},{"react/addons":6}],186:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Options = React.createClass({
+  displayName: "Options",
+
+  render: function render() {
+
+    return React.createElement(
+      "div",
+      { className: "options container" },
+      "hi"
+    );
+  }
+});
+
+module.exports = Options;
+
+
+},{"react/addons":6}],187:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var Stats = React.createClass({
+  displayName: "Stats",
+
+  render: function render() {
+
+    return React.createElement(
+      "div",
+      { className: "stats container" },
+      "hi"
+    );
+  }
+});
+
+module.exports = Stats;
+
+
+},{"react/addons":6}],188:[function(require,module,exports){
+"use strict";
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var React = require("react/addons");
+var Options = require("./Options");
+var Stats = require("./Stats");
+var Details = require("./Details");
+var actions = require("../../actions/appActions");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var View = React.createClass({
+  displayName: "View",
+
+  onClickBack: function onClickBack() {
+
+    this.setState({
+      subview: "details"
+    });
+  },
+
+  onClickOptions: function onClickOptions() {
+
+    this.setState({
+      subview: "options"
+    });
+  },
+
+  onClickStats: function onClickStats() {
+
+    this.setState({
+      subview: "stats"
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      subview: "details"
+    };
+  },
+
+  render: function render() {
+
+    var self = this;
+    var props = this.props;
+    var subviewState = self.state.subview;
+    var subview;
+
+    switch (subviewState) {
+      case "options":
+        subview = React.createElement(Options, _extends({}, props, { onBack: self.onClickBack }));
+        break;
+      case "stats":
+        subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
+        break;
+      default:
+        subview = React.createElement(Details, props);
+    }
+
+    return React.createElement(
+      "div",
+      { className: "view" },
+      subview
+    );
+  }
+});
+
+module.exports = View;
+
+
+},{"../../actions/appActions":178,"./Details":185,"./Options":186,"./Stats":187,"react/addons":6}],189:[function(require,module,exports){
+"use strict";
+
+var React = require("react/addons");
 var applicationState = require("./stores/applicationState");
 var BrowserActionApp = React.createFactory(require("./components/BrowserActionApp"));
 var mountNode = document.getElementById("react-main-mount");
@@ -23443,11 +23683,12 @@ var mountNode = document.getElementById("react-main-mount");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
-function renderApp(lists, accessToken) {
+function renderApp(lists, task, accessToken) {
 
   var browserActionApp = new BrowserActionApp({
     lists: lists || [],
-    loggedIn: !!accessToken
+    loggedIn: !!accessToken,
+    taskID: task && task.id
   });
 
   React.render(browserActionApp, mountNode);
@@ -23457,8 +23698,9 @@ background.fetchToken(function (accessToken) {
 
   if (accessToken) {
     background.fetchLists().always(function (lists) {
-
-      renderApp(lists, accessToken);
+      background.fetchTask(function (task) {
+        renderApp(lists, task, accessToken);
+      });
     });
   } else {
     renderApp();
@@ -23466,7 +23708,7 @@ background.fetchToken(function (accessToken) {
 });
 
 
-},{"./components/BrowserActionApp":179,"./stores/applicationState":189,"react/addons":6}],186:[function(require,module,exports){
+},{"./components/BrowserActionApp":179,"./stores/applicationState":193,"react/addons":6}],190:[function(require,module,exports){
 "use strict";
 
 /**
@@ -23512,7 +23754,7 @@ module.exports = {
 };
 
 
-},{}],187:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23600,7 +23842,7 @@ _.extend(BaseStore.prototype, {
 module.exports = BaseStore;
 
 
-},{"./constants":190,"events":1,"util":5}],188:[function(require,module,exports){
+},{"./constants":194,"events":1,"util":5}],192:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23674,7 +23916,7 @@ _.extend(KeyValueStore.prototype, {
 module.exports = KeyValueStore;
 
 
-},{"./BaseStore":187,"util":5}],189:[function(require,module,exports){
+},{"./BaseStore":191,"util":5}],193:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23690,7 +23932,7 @@ util.inherits(ApplicationState, KeyValueStore);
 module.exports = new ApplicationState();
 
 
-},{"./KeyValueStore":188,"util":5}],190:[function(require,module,exports){
+},{"./KeyValueStore":192,"util":5}],194:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -23698,4 +23940,4 @@ module.exports = {
 };
 
 
-},{}]},{},[185])
+},{}]},{},[189])

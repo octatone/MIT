@@ -8,11 +8,12 @@ var mountNode = document.getElementById('react-main-mount');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
-function renderApp (lists, accessToken) {
+function renderApp (lists, task, accessToken) {
 
   var browserActionApp = new BrowserActionApp({
     'lists': lists || [],
-    'loggedIn': !!accessToken
+    'loggedIn': !!accessToken,
+    'taskID': task && task.id
   });
 
   React.render(browserActionApp, mountNode);
@@ -22,8 +23,9 @@ background.fetchToken(function (accessToken) {
 
   if (accessToken) {
     background.fetchLists().always(function (lists) {
-
-      renderApp(lists, accessToken);
+      background.fetchTask(function (task) {
+        renderApp(lists, task, accessToken);
+      });
     });
   }
   else {
