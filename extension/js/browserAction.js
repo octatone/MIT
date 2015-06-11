@@ -22802,7 +22802,7 @@ module.exports = {
 };
 
 
-},{"../stores/applicationState":189}],179:[function(require,module,exports){
+},{"../stores/applicationState":193}],179:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -22812,6 +22812,7 @@ var applicationState = require("../stores/applicationState");
 var bindableMixin = require("../mixins/bindable");
 var Login = require("./Login");
 var Edit = require("./edit/Edit");
+var View = require("./view/View");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
@@ -22839,13 +22840,10 @@ var BrowserActionApp = React.createClass({
       for (var key in changes) {
         var storageChange = changes[key];
         console.log("Storage key \"%s\" in namespace \"%s\" changed. " + "Old value was \"%s\", new value is \"%s\".", key, namespace, storageChange.oldValue, storageChange.newValue);
-<<<<<<< HEAD
       }
 
       if (changes.accessToken) {
         self.onChangeAccessToken(changes.accessToken.newValue);
-=======
->>>>>>> view view now renders with a task
       }
     });
 
@@ -22900,15 +22898,10 @@ var BrowserActionApp = React.createClass({
     var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-<<<<<<< HEAD
-      return React.createElement(Edit, _extends({}, props, state));
-    } else if (loggedIn && taskDefined) {} else {
-=======
       return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else if (loggedIn && taskDefined) {
       return React.createElement(View, _extends({}, props, state));
     } else {
->>>>>>> view view now renders with a task
       return React.createElement(Login, null);
     }
   }
@@ -22916,10 +22909,8 @@ var BrowserActionApp = React.createClass({
 
 module.exports = BrowserActionApp;
 
-// view details
 
-
-},{"../mixins/bindable":186,"../stores/applicationState":189,"./Login":180,"./edit/Edit":181,"react/addons":6}],180:[function(require,module,exports){
+},{"../mixins/bindable":190,"../stores/applicationState":193,"./Login":180,"./edit/Edit":181,"./view/View":188,"react/addons":6}],180:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -23446,11 +23437,7 @@ var Time = React.createClass({
           React.createElement("span", { className: "pictogram-icon wundercon icon-back white" }),
           React.createElement(
             "button",
-<<<<<<< HEAD
-            { className: "bg-blue left-align white next" },
-=======
             { onClick: self.onClickNext, className: "bg-blue left-align white next" },
->>>>>>> view view now renders with a task
             "Next"
           )
         )
@@ -23466,8 +23453,6 @@ module.exports = Time;
 "use strict";
 
 var React = require("react/addons");
-<<<<<<< HEAD
-=======
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
@@ -23691,7 +23676,6 @@ module.exports = View;
 "use strict";
 
 var React = require("react/addons");
->>>>>>> sort of working subtask fetching
 var applicationState = require("./stores/applicationState");
 var BrowserActionApp = React.createFactory(require("./components/BrowserActionApp"));
 var mountNode = document.getElementById("react-main-mount");
@@ -23699,31 +23683,24 @@ var mountNode = document.getElementById("react-main-mount");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
-function renderApp(lists, accessToken) {
+function renderApp(lists, task, accessToken) {
 
   var browserActionApp = new BrowserActionApp({
     lists: lists || [],
-    loggedIn: !!accessToken
+    loggedIn: !!accessToken,
+    taskID: task && task.id
   });
 
-<<<<<<< HEAD
   React.render(browserActionApp, mountNode);
 }
 
 background.fetchToken(function (accessToken) {
-=======
-    background.fetchTask(function (task) {
-      var browserActionApp = new BrowserActionApp({
-        lists: lists || [],
-        loggedIn: !!accessToken,
-        task: task || undefined
-      });
->>>>>>> view view now renders with a task
 
   if (accessToken) {
     background.fetchLists().always(function (lists) {
-
-      renderApp(lists, accessToken);
+      background.fetchTask(function (task) {
+        renderApp(lists, task, accessToken);
+      });
     });
   } else {
     renderApp();
@@ -23731,7 +23708,7 @@ background.fetchToken(function (accessToken) {
 });
 
 
-},{"./components/BrowserActionApp":179,"./stores/applicationState":189,"react/addons":6}],186:[function(require,module,exports){
+},{"./components/BrowserActionApp":179,"./stores/applicationState":193,"react/addons":6}],190:[function(require,module,exports){
 "use strict";
 
 /**
@@ -23777,7 +23754,7 @@ module.exports = {
 };
 
 
-},{}],187:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23865,7 +23842,7 @@ _.extend(BaseStore.prototype, {
 module.exports = BaseStore;
 
 
-},{"./constants":190,"events":1,"util":5}],188:[function(require,module,exports){
+},{"./constants":194,"events":1,"util":5}],192:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23939,7 +23916,7 @@ _.extend(KeyValueStore.prototype, {
 module.exports = KeyValueStore;
 
 
-},{"./BaseStore":187,"util":5}],189:[function(require,module,exports){
+},{"./BaseStore":191,"util":5}],193:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -23955,7 +23932,7 @@ util.inherits(ApplicationState, KeyValueStore);
 module.exports = new ApplicationState();
 
 
-},{"./KeyValueStore":188,"util":5}],190:[function(require,module,exports){
+},{"./KeyValueStore":192,"util":5}],194:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -23963,4 +23940,4 @@ module.exports = {
 };
 
 
-},{}]},{},[185])
+},{}]},{},[189])
