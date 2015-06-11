@@ -5,6 +5,7 @@ var applicationState = require('../stores/applicationState');
 var bindableMixin = require('../mixins/bindable');
 var Login = require('./Login');
 var Edit = require('./edit/Edit');
+var View = require('./view/View');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
@@ -59,6 +60,16 @@ var BrowserActionApp = React.createClass({
     self.bindToApplicationState();
   },
 
+  'fetchTaskData': function () {
+
+    var self = this;
+    background.fetchTask(function (task) {
+      self.setProps({
+        'task': task
+      });
+    });
+  },
+
   'getInitialState': function () {
 
     return {};
@@ -73,10 +84,10 @@ var BrowserActionApp = React.createClass({
     var taskDefined = props.task;
 
     if (loggedIn && !taskDefined) {
-      return <Edit {...props} {...state}/>;
+      return <Edit {...props} {...state} onComplete={self.fetchTaskData}/>;
     }
     else if (loggedIn && taskDefined) {
-      // view details
+      return <View {...props} {...state}/>;
     }
     else {
       return <Login/>;

@@ -193,6 +193,27 @@ function fetchToken (callback) {
   });
 }
 
+function fetchTask (callback) {
+
+  storage.get(['taskID'], function (data) {
+    var taskID = data.taskID;
+
+    if (!taskID) {
+      callback('');
+      return;
+    }
+
+    getService('tasks').getID(taskID)
+      .done(function (taskData, statusCode) {
+        callback(taskData);
+      })
+      .fail(function (resp, code) {
+        console.log(errrr)
+      });
+  });
+}
+
+
 function getService (service) {
 
   var options = {
@@ -249,6 +270,12 @@ function createSubtask (subtaskTitle, taskID) {
     'title': subtaskTitle,
     'task_id': taskID
   });
+}
+
+function fetchSubtasks (taskID) {
+
+  console.log(taskID)
+  return getService('subtasks').forTask(taskID);
 }
 
 function createNotification (data) {
