@@ -18,7 +18,7 @@
   "homepage": "https://github.com/octatone/MIT",
   "dependencies": {
     "babelify": "^5.0.4",
-    "classnames": "^1.2.0",
+    "classnames": "^1.2.2",
     "gulp": "^3.8.11",
     "gulp-browserify": "^0.5.1",
     "gulp-json-editor": "^2.2.1",

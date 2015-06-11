@@ -10,11 +10,7 @@ var Steps = React.createClass({
   'onClickNext': function () {
 
     var self = this;
-    var steps = self.state.steps;
-    if (steps && steps.length) {
-      actions.createSteps(steps, self.props.taskID);
-    }
-    self.props.onDone();
+    self.props.onDone(self.state.steps);
   },
 
   'addStep': function () {
@@ -117,7 +113,11 @@ var Steps = React.createClass({
           </ul>
 
           <div className="button-wrapper">
-            <button className="left ml1 button button-outline blue">Back</button>
+            <button
+              onClick={self.props.onBack}
+              className="left ml1 button button-outline blue">
+                Back
+            </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
               onClick={self.onClickNext}

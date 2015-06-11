@@ -6,9 +6,36 @@ var background = chrome.extension.getBackgroundPage();
 
 var Time = React.createClass({
 
+  'onChangeDate': function (e) {
+
+    this.setState({
+      'date': e.target.value
+    });
+  },
+
+  'onChangeTime': function (e) {
+
+    this.setState({
+      'time': e.target.value
+    });
+  },
+
   'onClickNext': function () {
 
-    this.props.onDone();
+    var self = this;
+    var state = self.state;
+    self.props.onDone({
+      'date': state.date,
+      'time': state.time
+    });
+  },
+
+  'getInitialState': function () {
+
+    return {
+      'date': undefined,
+      'time': undefined
+    };
   },
 
   'render': function () {
@@ -23,14 +50,28 @@ var Time = React.createClass({
         <div className="content-wrapper">
           <h4 className="subheading">Pick a date and time that is practical</h4>
           <div className="fake-input mt1 mb1">
-            <input type="date" className="due-date inline-block half-width" />
+            <input
+              onChange={self.onChangeDate}
+              type="date"
+              className="due-date inline-block half-width" />
             <span className="blocker"></span>
-            <input type="time" className="due-date inline-block " />
+            <input
+              onChange={self.onChangeTime}
+              type="time"
+              className="due-date inline-block " />
           </div>
           <div className="button-wrapper">
-            <button className="left ml1 button button-outline blue">Back</button>
+            <button
+              onClick={self.props.onBack}
+              className="left ml1 button button-outline blue">
+              Back
+            </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
-            <button onClick={self.onClickNext} className="bg-blue left-align white next">Next</button>
+            <button
+              onClick={self.onClickNext}
+              className="bg-blue left-align white next">
+                Next
+            </button>
           </div>
         </div>
       </div>
