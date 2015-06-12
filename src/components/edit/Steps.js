@@ -106,8 +106,20 @@ var Steps = React.createClass({
   'componentWillReceiveProps': function (nextProps) {
 
     var self = this;
-    if (nextProps.taskID && self.props.taskID !== nextProps.taskID) {
+    var currentProps = self.props;
+
+    var isNotCreateTask = nextProps.createTask === false;
+    var isNowAnExistingTask = isNotCreateTask && currentProps.createTask !== nextProps.createTask;
+    var isNowCreatingTask = nextProps.createTask === true && currentProps.createTask !== nextProps.createTask;
+    var taskIDChanged = currentProps.taskID !== nextProps.taskID;
+
+    if (nextProps.taskID && isNotCreateTask && (taskIDChanged || isNowAnExistingTask)) {
       self.fetchSubtasks(nextProps.taskID);
+    }
+    else if (isNowCreatingTask) {
+      self.setState({
+        'subTasks': []
+      });
     }
   },
 

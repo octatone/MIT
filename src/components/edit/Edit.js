@@ -180,11 +180,11 @@ var Edit = React.createClass({
         </div>
 
         <div className={stepsClasses}>
-          <Steps ref="stepsEdit" {...props} taskID={state.taskID} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
+          <Steps ref="stepsEdit" {...props} createTask={state.createTask} taskID={state.taskID} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
         </div>
 
         <div className={timeClasses}>
-          <Time ref="timeEdit" {...props} taskID={state.taskID} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
+          <Time ref="timeEdit" {...props} createTask={state.createTask} taskID={state.taskID} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
         </div>
       </div>
     );

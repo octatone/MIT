@@ -37,7 +37,7 @@ var Task = React.createClass({
 
     var taskID = e.target.value && parseInt(e.target.value, 10);
     this.setState({
-      'selectedTask': taskID
+      'taskID': taskID
     });
   },
 
@@ -212,7 +212,7 @@ var Task = React.createClass({
               and a to do
             </h4>
             <select
-              onChange={self.onTaskInputChange}
+              onChange={self.onTaskSelectChange}
               className="tasks block px1 full-width"
               disabled={!hasTasks}>
                 {taskOptions}

@@ -53,19 +53,43 @@ var Time = React.createClass({
     React.findDOMNode(this.refs.dateInput).focus();
   },
 
+  'getDefaultTimeData': function () {
+
+    var date = moment().add(3, 'hours');
+    return {
+      'date': date.format('YYYY-MM-DD'),
+      'time': date.format('HH:mm')
+    };
+  },
+
   'getInitialState': function () {
 
+    var defaultTimeDate = this.getDefaultTimeData();
     return {
-      'date': undefined,
-      'time': undefined
+      'date': defaultTimeDate.data,
+      'time': defaultTimeDate.time
     };
   },
 
   'componentWillReceiveProps': function (nextProps) {
 
     var self = this;
-    if (nextProps.taskID && self.props.taskID !== nextProps.taskID) {
+    var currentProps = self.props;
+
+    var isNotCreateTask = nextProps.createTask === false;
+    var isNowAnExistingTask = isNotCreateTask && currentProps.createTask !== nextProps.createTask;
+    var isNowCreatingTask = nextProps.createTask === true && currentProps.createTask !== nextProps.createTask;
+    var taskIDChanged = currentProps.taskID !== nextProps.taskID;
+
+    if (nextProps.taskID && isNotCreateTask && (taskIDChanged || isNowAnExistingTask)) {
       self.fetchTime(nextProps.taskID);
+    }
+    else if (isNowCreatingTask) {
+      var defaultTimeDate = self.getDefaultTimeData();
+      self.setState({
+        'date': defaultTimeDate.date,
+        'time': defaultTimeDate.time
+      });
     }
   },
 
