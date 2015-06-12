@@ -1,6 +1,7 @@
 'use strict';
 
 var applicationState = require('../stores/applicationState');
+var moment = require('moment');
 
 var chrome = window.chrome;
 var syncStorage = chrome.storage.sync;
@@ -34,7 +35,10 @@ module.exports = {
       .done(function (task) {
 
         self.setTaskID(task.id)
-          .done(deferred.resolve, deferred);
+          .done(function () {
+
+            deferred.resolve(task);
+          });
       })
       .fail(function () {
 
@@ -56,6 +60,44 @@ module.exports = {
     });
 
     return when(deferreds).promise();
+  },
+
+ 'convertLocalTimeToServerTime': function (timeStamp) {
+
+    var serverTimestamp = moment(timeStamp)
+      .add('minutes', moment(timeStamp).zone())
+      .format('YYYY-MM-DDTHH:mm:ss');
+
+    return serverTimestamp + 'Z';
+  },
+
+  'createReminder': function (date, time, taskID) {
+
+    var self = this;
+
+    var deferred = new WBDeferred();
+    var timeParts = time.split(':');
+    var hours = parseInt(timeParts[0], 10);
+    var minutes = parseInt(timeParts[1], 10);
+    var reminderDate = moment(date);
+    reminderDate.add(hours, 'hours').add(minutes, 'minutes');
+    var timestamp = self.convertLocalTimeToServerTime(reminderDate.format());
+
+    background.fetchReminderForTask(taskID)
+      .always(function (reminders) {
+
+        var reminder = reminders && reminders.length && reminders[0];
+        if (reminder) {
+          background.updateReminder(timestamp, reminder.revision, reminder.id)
+            .done(deferred.resolve, deferred);
+        }
+        else {
+          background.createReminder(timestamp, taskID)
+            .done(deferred.resolve, deferred);
+        }
+      });
+
+    return deferred.promise();
   },
 
   'syncAllThethings': function (data) {
@@ -99,7 +141,8 @@ module.exports = {
       }
 
       if (date && time) {
-        timeDeferred.resolve();
+        self.createReminder(date, time, taskID)
+          .done(timeDeferred.resolve, timeDeferred);
       }
     });
 

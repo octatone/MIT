@@ -212,20 +212,34 @@ function fetchLists () {
 }
 
 function fetchTasks (listID) {
-
   return getService('tasks').forList(listID);
 }
 
 function createTask (taskTitle, listID) {
-
   return getService('tasks').create({
     'title': taskTitle,
     'list_id': listID
   });
 }
 
-function createSubtask (subtaskTitle, taskID) {
+function fetchReminderForTask (taskID) {
+  return getService('reminders').forTask(taskID);
+}
 
+function createReminder (timestamp, taskID) {
+  return getService('reminders').create({
+    'date': timestamp,
+    'task_id': taskID
+  });
+}
+
+function updateReminder (timestamp, revision, reminderID) {
+  return getService('reminders').update(reminderID, revision, {
+    'date': timestamp
+  });
+}
+
+function createSubtask (subtaskTitle, taskID) {
   return getService('subtasks').create({
     'title': subtaskTitle,
     'task_id': taskID
@@ -233,8 +247,6 @@ function createSubtask (subtaskTitle, taskID) {
 }
 
 function fetchSubtasks (taskID) {
-
-  console.log(taskID)
   return getService('subtasks').forTask(taskID);
 }
 
