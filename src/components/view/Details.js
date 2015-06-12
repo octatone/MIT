@@ -4,6 +4,7 @@ var React = require('react/addons');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = require('./TaskInlineEdit');
+var classNames = require('classnames');
 
 var Details = React.createClass({
 
@@ -45,7 +46,7 @@ var Details = React.createClass({
   'updateSubtaskTitle': function (subtask, newTitle) {
 
     var self = this;
-    background.updateSubtask(subtask, {'title':newTitle}).always(self.fetchSubtasks.bind(self));
+    background.updateSubtask(subtask, {'title':newTitle}).always(self.fetchSubtasks, self);
   },
 
   'toggleSubtask': function (subtask, override) {
@@ -70,8 +71,13 @@ var Details = React.createClass({
 
     var self = this;
     return self.state.subTasks.map(function (subtask) {
-      var classList = 'pictogram-icon wundercon gray mr1';
-      classList += (subtask.completed ? ' icon-checkbox-filled': ' icon-checkbox');
+      var classList = classNames(
+        'pictogram-icon', 'wundercon'. 'gray', 'mr1',
+        {
+          'icon-checkbox-filled': subtask.completed,
+          'icon-checkbox': !subtask.completed
+      });
+
       return <li key={subtask.id} value={subtask.id}>
                <TaskInlineEdit className={classList} onClick={self.toggleSubtask.bind(self, subtask)} updateValue={self.updateSubtaskTitle.bind(self, subtask)} title={subtask.title}/>
              </li>;
@@ -99,8 +105,12 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
-    var classList = 'pictogram-icon wundercon gray mr1';
-    classList += (task.completed ? ' icon-checkbox-filled': ' icon-checkbox');
+    var classList = classNames(
+        'pictogram-icon', 'wundercon'. 'gray', 'mr1',
+        {
+          'icon-checkbox-filled': task.completed,
+          'icon-checkbox': !task.completed
+      });
 
     return (
       <div className="details container">
