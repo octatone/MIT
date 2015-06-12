@@ -106,7 +106,9 @@ var Steps = React.createClass({
   'componentWillReceiveProps': function (nextProps) {
 
     var self = this;
-    nextProps.taskID && self.fetchSubtasks(nextProps.taskID);
+    if (nextProps.taskID && self.props.taskID !== nextProps.taskID) {
+      self.fetchSubtasks(nextProps.taskID);
+    }
   },
 
   'render': function () {
