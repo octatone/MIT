@@ -62,13 +62,44 @@ module.exports = {
     return when(deferreds).promise();
   },
 
- 'convertLocalTimeToServerTime': function (timeStamp) {
+  'convertLocalTimeToServerTime': function (timeStamp) {
 
     var serverTimestamp = moment(timeStamp)
-      .add('minutes', moment(timeStamp).zone())
+      .add(moment(timeStamp).utcOffset(), 'minutes')
       .format('YYYY-MM-DDTHH:mm:ss');
 
     return serverTimestamp + 'Z';
+  },
+
+  'convertServerTimeToLocalTime': function (timeStamp) {
+
+    timeStamp = timeStamp.replace('Z', '');
+
+    var locaTimestamp = moment(timeStamp)
+      .subtract(moment(timeStamp, 'YYYY-MM-DDTHH:mm:ss').utcOffset(), 'minutes')
+      .format('YYYY-MM-DDTHH:mm:ss');
+
+    return locaTimestamp;
+  },
+
+  'fetchReminderForTask': function (taskID) {
+
+    var self = this;
+    var deferred = new WBDeferred();
+    background.fetchReminderForTask(taskID)
+      .done(function (reminders) {
+
+        var reminder = reminders && reminders[0];
+        if (reminder) {
+          reminder.date = self.convertServerTimeToLocalTime(reminder.date);
+          deferred.resolve(reminder);
+        }
+        else {
+          deferred.resolve();
+        }
+      });
+
+    return deferred.promise();
   },
 
   'createReminder': function (date, time, taskID) {
@@ -84,9 +115,9 @@ module.exports = {
     var timestamp = self.convertLocalTimeToServerTime(reminderDate.format());
 
     background.fetchReminderForTask(taskID)
-      .always(function (reminders) {
+      .done(function (reminders) {
 
-        var reminder = reminders && reminders.length && reminders[0];
+        var reminder = reminders && reminders[0];
         if (reminder) {
           background.updateReminder(timestamp, reminder.revision, reminder.id)
             .done(deferred.resolve, deferred);

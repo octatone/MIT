@@ -3,9 +3,26 @@
 var React = require('react/addons');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var actions = require('../../actions/appActions');
 var classNames = require('classnames');
+var moment = require('moment');
 
 var Time = React.createClass({
+
+  'fetchTime': function (taskID) {
+
+    var self = this;
+    actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        self.setState({
+          'date': date.format('YYYY-MM-DD'),
+          'time': date.format('HH:mm')
+        });
+      }
+    });
+  },
 
   'onChangeDate': function (e) {
 
@@ -44,6 +61,14 @@ var Time = React.createClass({
     };
   },
 
+  'componentWillReceiveProps': function (nextProps) {
+
+    var self = this;
+    if (nextProps.taskID && self.props.taskID !== nextProps.taskID) {
+      self.fetchTime(nextProps.taskID);
+    }
+  },
+
   'render': function () {
 
     var self = this;
@@ -72,11 +97,13 @@ var Time = React.createClass({
               ref="dateInput"
               onChange={self.onChangeDate}
               type="date"
+              value={state.date}
               className="due-date inline-block half-width" />
             <span className="blocker"></span>
             <input
               onChange={self.onChangeTime}
               type="time"
+              value={state.time}
               className="due-date inline-block " />
           </div>
           <div className="button-wrapper">

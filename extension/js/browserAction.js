@@ -25979,9 +25979,36 @@ module.exports = {
 
   convertLocalTimeToServerTime: function convertLocalTimeToServerTime(timeStamp) {
 
-    var serverTimestamp = moment(timeStamp).add("minutes", moment(timeStamp).zone()).format("YYYY-MM-DDTHH:mm:ss");
+    var serverTimestamp = moment(timeStamp).add(moment(timeStamp).utcOffset(), "minutes").format("YYYY-MM-DDTHH:mm:ss");
 
     return serverTimestamp + "Z";
+  },
+
+  convertServerTimeToLocalTime: function convertServerTimeToLocalTime(timeStamp) {
+
+    timeStamp = timeStamp.replace("Z", "");
+
+    var locaTimestamp = moment(timeStamp).subtract(moment(timeStamp, "YYYY-MM-DDTHH:mm:ss").utcOffset(), "minutes").format("YYYY-MM-DDTHH:mm:ss");
+
+    return locaTimestamp;
+  },
+
+  fetchReminderForTask: function fetchReminderForTask(taskID) {
+
+    var self = this;
+    var deferred = new WBDeferred();
+    background.fetchReminderForTask(taskID).done(function (reminders) {
+
+      var reminder = reminders && reminders[0];
+      if (reminder) {
+        reminder.date = self.convertServerTimeToLocalTime(reminder.date);
+        deferred.resolve(reminder);
+      } else {
+        deferred.resolve();
+      }
+    });
+
+    return deferred.promise();
   },
 
   createReminder: function createReminder(date, time, taskID) {
@@ -25996,9 +26023,9 @@ module.exports = {
     reminderDate.add(hours, "hours").add(minutes, "minutes");
     var timestamp = self.convertLocalTimeToServerTime(reminderDate.format());
 
-    background.fetchReminderForTask(taskID).always(function (reminders) {
+    background.fetchReminderForTask(taskID).done(function (reminders) {
 
-      var reminder = reminders && reminders.length && reminders[0];
+      var reminder = reminders && reminders[0];
       if (reminder) {
         background.updateReminder(timestamp, reminder.revision, reminder.id).done(deferred.resolve, deferred);
       } else {
@@ -26299,8 +26326,6 @@ var Edit = React.createClass({
 
   onTaskDone: function onTaskDone(taskData) {
 
-    console.log(taskData);
-
     var self = this;
     self.setState({
       listID: taskData.listID,
@@ -26315,8 +26340,6 @@ var Edit = React.createClass({
 
   onStepsDone: function onStepsDone(steps) {
 
-    console.log(steps);
-
     var self = this;
     self.setState({
       steps: steps
@@ -26328,15 +26351,11 @@ var Edit = React.createClass({
 
   onTimeDone: function onTimeDone(timeData) {
 
-    console.log(timeData);
-
     var self = this;
     self.setState({
       time: timeData.time,
       date: timeData.date
     }, function () {
-
-      console.dir(self.state);
 
       actions.syncAllThethings(self.state).done(self.props.onComplete, self);
     });
@@ -26363,8 +26382,9 @@ var Edit = React.createClass({
   render: function render() {
 
     var self = this;
-    var props = this.props;
-    var subviewState = self.state.subview;
+    var props = self.props;
+    var state = self.state;
+    var subviewState = state.subview;
 
     var isTimeVisible = subviewState === "time";
     var isStepsVisible = subviewState === "steps";
@@ -26401,12 +26421,12 @@ var Edit = React.createClass({
       React.createElement(
         "div",
         { className: stepsClasses },
-        React.createElement(Steps, _extends({ ref: "stepsEdit" }, props, { onDone: self.onStepsDone, onBack: self.onStepsBack }))
+        React.createElement(Steps, _extends({ ref: "stepsEdit" }, props, { taskID: state.taskID, onDone: self.onStepsDone, onBack: self.onStepsBack }))
       ),
       React.createElement(
         "div",
         { className: timeClasses },
-        React.createElement(Time, _extends({ ref: "timeEdit" }, props, { onDone: self.onTimeDone, onBack: self.onTimeBack }))
+        React.createElement(Time, _extends({ ref: "timeEdit" }, props, { taskID: state.taskID, onDone: self.onTimeDone, onBack: self.onTimeBack }))
       )
     );
   }
@@ -26425,6 +26445,17 @@ var actions = require("../../actions/appActions");
 
 var Steps = React.createClass({
   displayName: "Steps",
+
+  fetchSubtasks: function fetchSubtasks(taskID) {
+
+    var self = this;
+    background.fetchSubtasks(taskID).always(function (subTasks) {
+
+      self.setState({
+        subTasks: subTasks || []
+      });
+    });
+  },
 
   onClickNext: function onClickNext() {
 
@@ -26478,6 +26509,17 @@ var Steps = React.createClass({
     });
   },
 
+  renderSubtasks: function renderSubtasks() {
+
+    return this.state.subTasks.map(function (subtask) {
+      return React.createElement(
+        "li",
+        { key: subtask.id, className: "num-list" },
+        subtask.title
+      );
+    });
+  },
+
   renderSteps: function renderSteps() {
 
     var self = this;
@@ -26501,14 +26543,22 @@ var Steps = React.createClass({
 
     return {
       steps: [],
+      subTasks: [],
       stepTitle: undefined
     };
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+
+    var self = this;
+    nextProps.taskID && self.fetchSubtasks(nextProps.taskID);
   },
 
   render: function render() {
 
     var self = this;
     var steps = self.renderSteps();
+    var subtasks = self.renderSubtasks();
     var stepTitle = self.state.stepTitle;
 
     return React.createElement(
@@ -26549,6 +26599,7 @@ var Steps = React.createClass({
         React.createElement(
           "ul",
           { className: "list-reset steps-list" },
+          subtasks,
           steps
         ),
         React.createElement(
@@ -26871,10 +26922,27 @@ module.exports = Task;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var actions = require("../../actions/appActions");
 var classNames = require("classnames");
+var moment = require("moment");
 
 var Time = React.createClass({
   displayName: "Time",
+
+  fetchTime: function fetchTime(taskID) {
+
+    var self = this;
+    actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        self.setState({
+          date: date.format("YYYY-MM-DD"),
+          time: date.format("HH:mm")
+        });
+      }
+    });
+  },
 
   onChangeDate: function onChangeDate(e) {
 
@@ -26911,6 +26979,14 @@ var Time = React.createClass({
       date: undefined,
       time: undefined
     };
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+
+    var self = this;
+    if (nextProps.taskID && self.props.taskID !== nextProps.taskID) {
+      self.fetchTime(nextProps.taskID);
+    }
   },
 
   render: function render() {
@@ -26950,11 +27026,13 @@ var Time = React.createClass({
             ref: "dateInput",
             onChange: self.onChangeDate,
             type: "date",
+            value: state.date,
             className: "due-date inline-block half-width" }),
           React.createElement("span", { className: "blocker" }),
           React.createElement("input", {
             onChange: self.onChangeTime,
             type: "time",
+            value: state.time,
             className: "due-date inline-block " })
         ),
         React.createElement(
@@ -26985,7 +27063,7 @@ var Time = React.createClass({
 module.exports = Time;
 
 
-},{"classnames":1,"react/addons":8}],187:[function(require,module,exports){
+},{"../../actions/appActions":180,"classnames":1,"moment":7,"react/addons":8}],187:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");

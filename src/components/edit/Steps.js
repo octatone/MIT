@@ -7,6 +7,17 @@ var actions = require('../../actions/appActions');
 
 var Steps = React.createClass({
 
+  'fetchSubtasks': function (taskID) {
+
+    var self = this;
+    background.fetchSubtasks(taskID).always(function (subTasks) {
+
+      self.setState({
+        'subTasks': subTasks || []
+      });
+    });
+  },
+
   'onClickNext': function () {
 
     var self = this;
@@ -59,11 +70,22 @@ var Steps = React.createClass({
     });
   },
 
+  'renderSubtasks': function () {
+
+    return this.state.subTasks.map(function (subtask) {
+      return  <li key={subtask.id} className="num-list">
+                {subtask.title}
+              </li>;
+    });
+  },
+
   'renderSteps': function () {
 
     var self = this;
     return this.state.steps.map(function (step, index) {
-      return <li key={step} className="num-list">{step} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteStep.bind(self, index)}></a></li>;
+      return  <li key={step} className="num-list">
+                {step} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteStep.bind(self, index)}></a>
+              </li>;
     });
   },
 
@@ -76,14 +98,22 @@ var Steps = React.createClass({
 
     return {
       'steps': [],
+      'subTasks': [],
       'stepTitle': undefined
     };
+  },
+
+  'componentWillReceiveProps': function (nextProps) {
+
+    var self = this;
+    nextProps.taskID && self.fetchSubtasks(nextProps.taskID);
   },
 
   'render': function () {
 
     var self = this;
     var steps = self.renderSteps();
+    var subtasks = self.renderSubtasks();
     var stepTitle = self.state.stepTitle;
 
     return (
@@ -115,6 +145,7 @@ var Steps = React.createClass({
           </button>
 
           <ul className="list-reset steps-list">
+            {subtasks}
             {steps}
           </ul>
 

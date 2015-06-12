@@ -77,8 +77,6 @@ var Edit = React.createClass({
 
   'onTaskDone': function (taskData) {
 
-    console.log(taskData);
-
     var self = this;
     self.setState({
       'listID': taskData.listID,
@@ -93,8 +91,6 @@ var Edit = React.createClass({
 
   'onStepsDone': function (steps) {
 
-    console.log(steps);
-
     var self = this;
     self.setState({
       'steps': steps
@@ -106,15 +102,11 @@ var Edit = React.createClass({
 
   'onTimeDone': function (timeData) {
 
-    console.log(timeData);
-
     var self = this;
     self.setState({
       'time': timeData.time,
       'date': timeData.date
     }, function () {
-
-      console.dir(self.state);
 
       actions.syncAllThethings(self.state).done(self.props.onComplete, self);
     });
@@ -145,8 +137,9 @@ var Edit = React.createClass({
   'render': function () {
 
     var self = this;
-    var props = this.props;
-    var subviewState = self.state.subview;
+    var props = self.props;
+    var state = self.state;
+    var subviewState = state.subview;
 
     var isTimeVisible = subviewState === 'time';
     var isStepsVisible = subviewState === 'steps';
@@ -187,11 +180,11 @@ var Edit = React.createClass({
         </div>
 
         <div className={stepsClasses}>
-          <Steps ref="stepsEdit" {...props} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
+          <Steps ref="stepsEdit" {...props} taskID={state.taskID} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
         </div>
 
         <div className={timeClasses}>
-          <Time ref="timeEdit" {...props} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
+          <Time ref="timeEdit" {...props} taskID={state.taskID} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
         </div>
       </div>
     );
