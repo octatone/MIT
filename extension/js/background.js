@@ -247,18 +247,14 @@ function createSubtask (subtaskTitle, taskID) {
   });
 }
 
-function toggleTaskComplete (task, value) {
-
-  return getService('tasks').update(task.id, task.revision, {
-    'completed': value
-  });
+function updateTask (task, data) {
+  console.log(data)
+  return getService('tasks').update(task.id, task.revision, data);
 }
 
-function toggleSubtaskComplete (subtask, value) {
+function updateSubtask (subtask, data) {
 
-  return getService('subtasks').update(subtask.id, subtask.revision, {
-    'completed': value
-  });
+  return getService('subtasks').update(subtask.id, subtask.revision, data);
 }
 
 function fetchSubtasks (taskID) {

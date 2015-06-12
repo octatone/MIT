@@ -27131,19 +27131,33 @@ var Details = React.createClass({
   completeMainTask: function completeMainTask() {
 
     var self = this;
-    background.toggleTaskComplete(self.props.task, !self.props.task.completed).always(function () {
-      self.props.onCompleteTask();
+    background.updateTask(self.props.task, { completed: !self.props.task.completed }).always(function () {
+      self.props.onUpdateTask();
       self.state.subTasks.map(function (subtask) {
         self.toggleSubtask(subtask, true);
       });
     });
   },
 
+  updateTaskTitle: function updateTaskTitle(newTitle) {
+
+    var self = this;
+    background.updateTask(self.props.task, { title: newTitle }).always(function () {
+      self.props.onUpdateTask();
+    });
+  },
+
+  updateSubtaskTitle: function updateSubtaskTitle(subtask, newTitle) {
+
+    var self = this;
+    background.updateSubtask(subtask, { title: newTitle }).always(self.fetchSubtasks.bind(self));
+  },
+
   toggleSubtask: function toggleSubtask(subtask, override) {
 
     var self = this;
     var shouldComplete = override === true ? true : !subtask.completed;
-    background.toggleSubtaskComplete(subtask, shouldComplete).always(self.fetchSubtasks.bind(self));
+    background.updateSubtask(subtask, { complete: shouldComplete }).always(self.fetchSubtasks.bind(self));
   },
 
   fetchSubtasks: function fetchSubtasks() {
@@ -27165,7 +27179,7 @@ var Details = React.createClass({
       return React.createElement(
         "li",
         { key: subtask.id, value: subtask.id },
-        React.createElement(TaskInlineEdit, { className: classList, onClick: self.toggleSubtask.bind(self, subtask), title: subtask.title })
+        React.createElement(TaskInlineEdit, { className: classList, onClick: self.toggleSubtask.bind(self, subtask), updateValue: self.updateSubtaskTitle.bind(self, subtask), title: subtask.title })
       );
     });
   },
@@ -27210,7 +27224,7 @@ var Details = React.createClass({
       React.createElement(
         "div",
         { className: "content-wrapper" },
-        React.createElement(TaskInlineEdit, { className: classList, textClasses: "main-task mb1 inline-block", onClick: self.completeMainTask, title: task.title }),
+        React.createElement(TaskInlineEdit, { className: classList, textClasses: "main-task mb1 inline-block", onClick: self.completeMainTask, updateValue: self.updateTaskTitle, title: task.title }),
         React.createElement(
           "ul",
           { className: "subtasks list-reset" },
@@ -27291,20 +27305,57 @@ var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = React.createClass({
   displayName: "TaskInlineEdit",
 
+  enterEditMode: function enterEditMode() {
+
+    this.setState({
+      editMode: true
+    });
+  },
+
+  updateValue: function updateValue(ev) {
+
+    var self = this;
+    self.props.updateValue(ev.target.value);
+    self.exitEditMode();
+  },
+
+  exitEditMode: function exitEditMode() {
+
+    this.setState({
+      editMode: false
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      editMode: false
+    };
+  },
+
   render: function render() {
 
     var self = this;
     var props = self.props;
-    return React.createElement(
-      "span",
-      null,
-      React.createElement("a", { className: props.className, onClick: props.onClick }),
-      React.createElement(
+
+    if (self.state.editMode === true) {
+      return React.createElement(
         "span",
-        { className: props.textClasses },
-        props.title
-      )
-    );
+        null,
+        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title })
+      );
+    } else {
+      return React.createElement(
+        "span",
+        null,
+        React.createElement("a", { className: props.className, onClick: props.onClick }),
+        React.createElement(
+          "span",
+          { className: props.textClasses, onClick: self.enterEditMode },
+          props.title
+        )
+      );
+    }
   }
 });
 
@@ -27375,7 +27426,7 @@ var View = React.createClass({
         subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
         break;
       default:
-        subview = React.createElement(Details, _extends({}, props, { onCompleteTask: self.setTask }));
+        subview = React.createElement(Details, _extends({}, props, { onUpdateTask: self.setTask }));
     }
 
     return React.createElement(

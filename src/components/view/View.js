@@ -58,7 +58,7 @@ var View = React.createClass({
         subview = <Stats {...props} onBack={self.onClickBack}/>;
         break;
       default:
-        subview = <Details {...props} onCompleteTask={self.setTask}/>;
+        subview = <Details {...props} onUpdateTask={self.setTask}/>;
     }
 
     return (

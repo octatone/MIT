@@ -26,19 +26,33 @@ var Details = React.createClass({
   'completeMainTask': function () {
 
     var self = this;
-    background.toggleTaskComplete(self.props.task, !self.props.task.completed).always(function () {
-      self.props.onCompleteTask();
+    background.updateTask(self.props.task, {'completed':!self.props.task.completed}).always(function () {
+      self.props.onUpdateTask();
       self.state.subTasks.map(function (subtask) {
         self.toggleSubtask(subtask, true);
       });
     });
   },
 
+  'updateTaskTitle': function (newTitle) {
+
+    var self = this;
+    background.updateTask(self.props.task, {'title':newTitle}).always(function () {
+      self.props.onUpdateTask();
+    });
+  },
+
+  'updateSubtaskTitle': function (subtask, newTitle) {
+
+    var self = this;
+    background.updateSubtask(subtask, {'title':newTitle}).always(self.fetchSubtasks.bind(self));
+  },
+
   'toggleSubtask': function (subtask, override) {
 
     var self = this;
     var shouldComplete = override === true ? true: !subtask.completed;
-    background.toggleSubtaskComplete(subtask, shouldComplete).always(self.fetchSubtasks.bind(self));
+    background.updateSubtask(subtask, {'complete':shouldComplete}).always(self.fetchSubtasks.bind(self));
   },
 
   'fetchSubtasks': function () {
@@ -59,7 +73,7 @@ var Details = React.createClass({
       var classList = 'pictogram-icon wundercon gray mr1';
       classList += (subtask.completed ? ' icon-checkbox-filled': ' icon-checkbox');
       return <li key={subtask.id} value={subtask.id}>
-               <TaskInlineEdit className={classList} onClick={self.toggleSubtask.bind(self, subtask)} title={subtask.title}/>
+               <TaskInlineEdit className={classList} onClick={self.toggleSubtask.bind(self, subtask)} updateValue={self.updateSubtaskTitle.bind(self, subtask)} title={subtask.title}/>
              </li>;
     });
   },
@@ -95,7 +109,7 @@ var Details = React.createClass({
           <h2>You have 3 days and 4 hours to get your task done.</h2>
         </div>
         <div className="content-wrapper">
-          <TaskInlineEdit className={classList} textClasses="main-task mb1 inline-block" onClick={self.completeMainTask} title={task.title}/>
+          <TaskInlineEdit className={classList} textClasses="main-task mb1 inline-block" onClick={self.completeMainTask} updateValue={self.updateTaskTitle} title={task.title}/>
           <ul className="subtasks list-reset">
             {renderedSubtasks}
           </ul>
