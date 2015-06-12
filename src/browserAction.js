@@ -13,7 +13,7 @@ function renderApp (lists, task, accessToken) {
   var browserActionApp = new BrowserActionApp({
     'lists': lists || [],
     'loggedIn': !!accessToken,
-    'taskID': task && task.id
+    'task': task
   });
 
   React.render(browserActionApp, mountNode);

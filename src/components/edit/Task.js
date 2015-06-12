@@ -4,6 +4,7 @@ var React = require('react/addons');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var actions = require('../../actions/appActions');
+var classNames = require('classnames');
 
 var Task = React.createClass({
 
@@ -36,7 +37,7 @@ var Task = React.createClass({
 
     var taskID = e.target.value && parseInt(e.target.value, 10);
     this.setState({
-      'selectedTask': taskID
+      'taskID': taskID
     });
   },
 
@@ -47,22 +48,56 @@ var Task = React.createClass({
     });
   },
 
+  'onCreateNewClicked': function () {
+
+    var self = this;
+    self.setState({
+      'entryMode': 'createNew'
+    }, function () {
+
+      self.focus();
+    });
+  },
+
+  'onChooseExistingClicked': function () {
+
+    var self = this;
+    self.setState({
+      'entryMode': 'chooseExisting'
+    }, function () {
+
+      self.focus();
+    });
+  },
+
+  'onBackClicked': function () {
+
+    this.setState({
+      'entryMode': undefined
+    });
+  },
+
   'onClickDone': function () {
 
     var self = this;
     var state = self.state;
     var props = self.props;
 
-    var taskTitle = state.taskTitle;
-    if (taskTitle && taskTitle.length) {
-      console.info('creating tast', taskTitle);
-      actions.createTaskAndSetTaskID(taskTitle, self.state.selectedList);
-      props.onDone();
-    }
-    else {
-      console.log('setting task id to', state.taskID);
-      actions.setTaskID(state.taskID);
-      props.onDone();
+    props.onDone({
+      'taskTitle': state.taskTitle,
+      'taskID': state.taskID,
+      'listID': state.selectedList,
+      'createTask': state.entryMode === 'createNew'
+    });
+  },
+
+  'focus': function () {
+
+    var self = this;
+    var state = self.state;
+    if (state.entryMode) {
+      var ref = state.entryMode === 'createNew' ? self.refs.createNew : self.refs.selectList;
+      React.findDOMNode(ref).focus();
     }
   },
 
@@ -90,7 +125,8 @@ var Task = React.createClass({
       'tasks': [],
       'selectedList': lists && lists.length && lists[0].id,
       'taskID': undefined,
-      'taskTitle': undefined
+      'taskTitle': undefined,
+      'entryMode': undefined
     };
   },
 
@@ -111,7 +147,32 @@ var Task = React.createClass({
     var listOptions = self.renderListOptions();
     var taskOptions = self.renderTaskOptions();
     var hasTasks = !!(state.tasks && state.tasks.length);
-    var ready = !!(state.taskID || state.taskTitle)
+    var taskPicked = state.taskID && state.entryMode === 'chooseExisting';
+    var taskEntered = state.taskTitle && state.entryMode === 'createNew'
+    var ready = !!(taskPicked || taskEntered);
+
+    var entryContainerClasses = classNames({
+      'display-none': !!state.entryMode
+    });
+    var chooseListContainerClasses = classNames({
+      'display-none': !state.entryMode
+    });
+    var chooseExistingContainerClasses = classNames({
+      'display-none': state.entryMode !== 'chooseExisting'
+    });
+    var createNewContainerClasses = classNames({
+      'display-none': state.entryMode !== 'createNew'
+    });
+    var buttonContainerClasses = classNames(
+      'button-wrapper',
+      {
+        'display-none': !state.entryMode
+    });
+    var nextButtonClasses = classNames(
+      'bg-blue', 'left-align', 'white', 'next',
+      {
+        'muted': !ready
+    })
 
     return (
       <div className="task-choice container">
@@ -122,38 +183,62 @@ var Task = React.createClass({
           </h2>
         </div>
         <div className="content-wrapper">
-          <h4 className="subheading">Choose a list ...</h4>
-          <select
-            onChange={this.onListSelectChange}
-            className="lists block px1 full-width"
-          >
-            {listOptions}
-          </select>
-          <h4 className="subheading center">
-            ... and an existing to do ...
-          </h4>
-          <select
-            onChange={self.onTaskInputChange}
-            className="tasks block px1 full-width"
-            disabled={!hasTasks}>
-            {taskOptions}
-          </select>
 
-          <h4 className="subheading right">
-            ... or add something new
-          </h4>
-          <input
-            className="task block fit-width field-light px1"
-            placeholder="Add the most important thing"
-            onChange={self.onTaskInputChange}/>
+          <div className={entryContainerClasses}>
+            <button
+              onClick={self.onChooseExistingClicked}
+              className="button mt2 mb1 button-outline blue full-width">
+                choose from existing
+            </button>
+            <button
+              onClick={self.onCreateNewClicked}
+              className="button button-outline blue full-width">
+                add something new
+            </button>
+          </div>
 
-          <div className="button-wrapper">
+          <div className={chooseListContainerClasses}>
+            <h4 className="subheading">Choose a list</h4>
+            <select
+              ref="selectList"
+              onChange={this.onListSelectChange}
+              className="lists block px1 full-width">
+                {listOptions}
+            </select>
+          </div>
+
+          <div className={chooseExistingContainerClasses}>
+            <h4 className="subheading">
+              and a to do
+            </h4>
+            <select
+              onChange={self.onTaskSelectChange}
+              className="tasks block px1 full-width"
+              disabled={!hasTasks}>
+                {taskOptions}
+            </select>
+          </div>
+
+          <div className={createNewContainerClasses}>
+            <input
+              ref="createNew"
+              className="task block fit-width field-light px1"
+              placeholder="Add the most important thing"
+              onChange={self.onTaskInputChange}/>
+          </div>
+
+          <div className={buttonContainerClasses}>
+            <button
+              onClick={self.onBackClicked}
+              className="left ml1 button button-outline blue">
+                Back
+            </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
-              className="bg-blue left-align white next"
+              className={nextButtonClasses}
               onClick={self.onClickDone}
               disabled={!ready}>
-              Next
+                Next
             </button>
           </div>
         </div>

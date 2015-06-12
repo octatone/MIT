@@ -1,5 +1,28 @@
 body {
+  width: 332px;
   background-color:#fafafa !important;
+}
+
+.edit {
+  width: 996px;
+  transition: 0.25s;
+}
+
+.edit > div {
+  transition: 0.75s;
+}
+
+.step-2 {
+  margin-left: -332px;
+}
+
+.step-3 {
+  margin-left: -664px;
+}
+
+.no-height {
+  height: 0px;
+  overflow: hidden;
 }
 
 .container {

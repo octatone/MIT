@@ -7,14 +7,21 @@ var actions = require('../../actions/appActions');
 
 var Steps = React.createClass({
 
+  'fetchSubtasks': function (taskID) {
+
+    var self = this;
+    background.fetchSubtasks(taskID).always(function (subTasks) {
+
+      self.setState({
+        'subTasks': subTasks || []
+      });
+    });
+  },
+
   'onClickNext': function () {
 
     var self = this;
-    var steps = self.state.steps;
-    if (steps && steps.length) {
-      actions.createSteps(steps, self.props.taskID);
-    }
-    self.props.onDone();
+    self.props.onDone(self.state.steps);
   },
 
   'addStep': function () {
@@ -63,26 +70,64 @@ var Steps = React.createClass({
     });
   },
 
+  'renderSubtasks': function () {
+
+    return this.state.subTasks.map(function (subtask) {
+      return  <li key={subtask.id} className="num-list">
+                {subtask.title}
+              </li>;
+    });
+  },
+
   'renderSteps': function () {
 
     var self = this;
     return this.state.steps.map(function (step, index) {
-      return <li key={step} className="num-list">{step} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteStep.bind(self, index)}></a></li>;
+      return  <li key={step} className="num-list">
+                {step} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteStep.bind(self, index)}></a>
+              </li>;
     });
+  },
+
+  'focus': function () {
+
+    React.findDOMNode(this.refs.stepInput).focus();
   },
 
   'getInitialState': function () {
 
     return {
       'steps': [],
+      'subTasks': [],
       'stepTitle': undefined
     };
+  },
+
+  'componentWillReceiveProps': function (nextProps) {
+
+    var self = this;
+    var currentProps = self.props;
+
+    var isNotCreateTask = nextProps.createTask === false;
+    var isNowAnExistingTask = isNotCreateTask && currentProps.createTask !== nextProps.createTask;
+    var isNowCreatingTask = nextProps.createTask === true && currentProps.createTask !== nextProps.createTask;
+    var taskIDChanged = currentProps.taskID !== nextProps.taskID;
+
+    if (nextProps.taskID && isNotCreateTask && (taskIDChanged || isNowAnExistingTask)) {
+      self.fetchSubtasks(nextProps.taskID);
+    }
+    else if (isNowCreatingTask) {
+      self.setState({
+        'subTasks': []
+      });
+    }
   },
 
   'render': function () {
 
     var self = this;
     var steps = self.renderSteps();
+    var subtasks = self.renderSubtasks();
     var stepTitle = self.state.stepTitle;
 
     return (
@@ -100,6 +145,7 @@ var Steps = React.createClass({
           </h4>
 
           <input
+            ref="stepInput"
             value={stepTitle}
             className="step-input block inline-block field-light px1 mt1 mb1"
             placeholder="Add a step"
@@ -113,11 +159,16 @@ var Steps = React.createClass({
           </button>
 
           <ul className="list-reset steps-list">
+            {subtasks}
             {steps}
           </ul>
 
           <div className="button-wrapper">
-            <button className="left ml1 button button-outline blue">Back</button>
+            <button
+              onClick={self.props.onBack}
+              className="left ml1 button button-outline blue">
+                Back
+            </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
               onClick={self.onClickNext}
