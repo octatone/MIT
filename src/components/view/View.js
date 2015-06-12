@@ -38,6 +38,11 @@ var View = React.createClass({
     };
   },
 
+  'setTask': function () {
+
+    this.props.onComplete();
+  },
+
   'render': function () {
 
     var self = this;
@@ -53,7 +58,7 @@ var View = React.createClass({
         subview = <Stats {...props} onBack={self.onClickBack}/>;
         break;
       default:
-        subview = <Details {...props} />;
+        subview = <Details {...props} onCompleteTask={self.setTask}/>;
     }
 
     return (

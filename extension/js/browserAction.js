@@ -26081,7 +26081,11 @@ module.exports = {
 };
 
 
+<<<<<<< HEAD
 },{"../stores/applicationState":195,"moment":7}],181:[function(require,module,exports){
+=======
+},{"../stores/applicationState":194}],179:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -26175,11 +26179,11 @@ var BrowserActionApp = React.createClass({
     var state = self.state;
     var loggedIn = props.loggedIn;
     var taskDefined = props.task;
-    console.log(taskDefined);
+
     if (loggedIn && !taskDefined) {
       return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else if (loggedIn && taskDefined) {
-      return React.createElement(View, _extends({}, props, state));
+      return React.createElement(View, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else {
       return React.createElement(Login, null);
     }
@@ -26189,7 +26193,11 @@ var BrowserActionApp = React.createClass({
 module.exports = BrowserActionApp;
 
 
+<<<<<<< HEAD
 },{"../mixins/bindable":192,"../stores/applicationState":195,"./Login":182,"./edit/Edit":183,"./view/View":190,"react/addons":8}],182:[function(require,module,exports){
+=======
+},{"../mixins/bindable":191,"../stores/applicationState":194,"./Login":180,"./edit/Edit":181,"./view/View":189,"react/addons":6}],180:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var React = require("react/addons");
@@ -27105,6 +27113,7 @@ module.exports = Time;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var TaskInlineEdit = require("./TaskInlineEdit");
 
 var Details = React.createClass({
   displayName: "Details",
@@ -27115,21 +27124,17 @@ var Details = React.createClass({
 
   onClickStats: function onClickStats() {},
 
-  onClickSettings: function onClickSettings() {
-
-    console.log("settings clicked");
-  },
+  onClickSettings: function onClickSettings() {},
 
   onClickHelp: function onClickHelp() {},
 
   completeMainTask: function completeMainTask() {
 
     var self = this;
-    background.toggleTaskComplete(self.props.task, true).always(function () {
-      background.fetchTask(function () {
-        self.state.subTasks.map(function (subtask) {
-          self.toggleSubtask(subtask, true);
-        });
+    background.toggleTaskComplete(self.props.task, !self.props.task.completed).always(function () {
+      self.props.onCompleteTask();
+      self.state.subTasks.map(function (subtask) {
+        self.toggleSubtask(subtask, true);
       });
     });
   },
@@ -27157,12 +27162,10 @@ var Details = React.createClass({
     return self.state.subTasks.map(function (subtask) {
       var classList = "pictogram-icon wundercon gray mr1";
       classList += subtask.completed ? " icon-checkbox-filled" : " icon-checkbox";
-
       return React.createElement(
         "li",
         { key: subtask.id, value: subtask.id },
-        React.createElement("a", { className: classList, onClick: self.toggleSubtask.bind(self, subtask) }),
-        subtask.title
+        React.createElement(TaskInlineEdit, { className: classList, onClick: self.toggleSubtask.bind(self, subtask), title: subtask.title })
       );
     });
   },
@@ -27207,12 +27210,7 @@ var Details = React.createClass({
       React.createElement(
         "div",
         { className: "content-wrapper" },
-        React.createElement("a", { className: classList, onClick: self.completeMainTask }),
-        React.createElement(
-          "h2",
-          { className: "inline-block m0 mb1 main-task" },
-          task.title
-        ),
+        React.createElement(TaskInlineEdit, { className: classList, textClasses: "main-task mb1 inline-block", onClick: self.completeMainTask, title: task.title }),
         React.createElement(
           "ul",
           { className: "subtasks list-reset" },
@@ -27233,7 +27231,11 @@ var Details = React.createClass({
 module.exports = Details;
 
 
+<<<<<<< HEAD
 },{"react/addons":8}],188:[function(require,module,exports){
+=======
+},{"./TaskInlineEdit":188,"react/addons":6}],186:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var React = require("react/addons");
@@ -27282,6 +27284,36 @@ module.exports = Stats;
 },{"react/addons":8}],190:[function(require,module,exports){
 "use strict";
 
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var TaskInlineEdit = React.createClass({
+  displayName: "TaskInlineEdit",
+
+  render: function render() {
+
+    var self = this;
+    var props = self.props;
+    return React.createElement(
+      "span",
+      null,
+      React.createElement("a", { className: props.className, onClick: props.onClick }),
+      React.createElement(
+        "span",
+        { className: props.textClasses },
+        props.title
+      )
+    );
+  }
+});
+
+module.exports = TaskInlineEdit;
+
+
+},{"react/addons":6}],189:[function(require,module,exports){
+"use strict";
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var React = require("react/addons");
@@ -27323,6 +27355,11 @@ var View = React.createClass({
     };
   },
 
+  setTask: function setTask() {
+
+    this.props.onComplete();
+  },
+
   render: function render() {
 
     var self = this;
@@ -27338,7 +27375,7 @@ var View = React.createClass({
         subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
         break;
       default:
-        subview = React.createElement(Details, props);
+        subview = React.createElement(Details, _extends({}, props, { onCompleteTask: self.setTask }));
     }
 
     return React.createElement(
@@ -27352,7 +27389,11 @@ var View = React.createClass({
 module.exports = View;
 
 
+<<<<<<< HEAD
 },{"../../actions/appActions":180,"./Details":187,"./Options":188,"./Stats":189,"react/addons":8}],191:[function(require,module,exports){
+=======
+},{"../../actions/appActions":178,"./Details":185,"./Options":186,"./Stats":187,"react/addons":6}],190:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var React = require("react/addons");
@@ -27388,7 +27429,11 @@ background.fetchToken(function (accessToken) {
 });
 
 
+<<<<<<< HEAD
 },{"./components/BrowserActionApp":181,"./stores/applicationState":195,"react/addons":8}],192:[function(require,module,exports){
+=======
+},{"./components/BrowserActionApp":179,"./stores/applicationState":194,"react/addons":6}],191:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 /**
@@ -27434,7 +27479,11 @@ module.exports = {
 };
 
 
+<<<<<<< HEAD
 },{}],193:[function(require,module,exports){
+=======
+},{}],192:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var util = require("util");
@@ -27522,7 +27571,11 @@ _.extend(BaseStore.prototype, {
 module.exports = BaseStore;
 
 
+<<<<<<< HEAD
 },{"./constants":196,"events":2,"util":6}],194:[function(require,module,exports){
+=======
+},{"./constants":195,"events":1,"util":5}],193:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var util = require("util");
@@ -27596,7 +27649,11 @@ _.extend(KeyValueStore.prototype, {
 module.exports = KeyValueStore;
 
 
+<<<<<<< HEAD
 },{"./BaseStore":193,"util":6}],195:[function(require,module,exports){
+=======
+},{"./BaseStore":192,"util":5}],194:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 var util = require("util");
@@ -27612,7 +27669,11 @@ util.inherits(ApplicationState, KeyValueStore);
 module.exports = new ApplicationState();
 
 
+<<<<<<< HEAD
 },{"./KeyValueStore":194,"util":6}],196:[function(require,module,exports){
+=======
+},{"./KeyValueStore":193,"util":5}],195:[function(require,module,exports){
+>>>>>>> tasks in component, can toggle now
 "use strict";
 
 module.exports = {
@@ -27620,4 +27681,8 @@ module.exports = {
 };
 
 
+<<<<<<< HEAD
 },{}]},{},[191])
+=======
+},{}]},{},[190])
+>>>>>>> tasks in component, can toggle now
