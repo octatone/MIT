@@ -26081,7 +26081,7 @@ module.exports = {
 };
 
 
-},{"../stores/applicationState":195,"moment":7}],181:[function(require,module,exports){
+},{"../stores/applicationState":196,"moment":7}],181:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -26179,7 +26179,7 @@ var BrowserActionApp = React.createClass({
     if (loggedIn && !taskDefined) {
       return React.createElement(Edit, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else if (loggedIn && taskDefined) {
-      return React.createElement(View, _extends({}, props, state));
+      return React.createElement(View, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else {
       return React.createElement(Login, null);
     }
@@ -26189,7 +26189,7 @@ var BrowserActionApp = React.createClass({
 module.exports = BrowserActionApp;
 
 
-},{"../mixins/bindable":192,"../stores/applicationState":195,"./Login":182,"./edit/Edit":183,"./view/View":190,"react/addons":8}],182:[function(require,module,exports){
+},{"../mixins/bindable":193,"../stores/applicationState":196,"./Login":182,"./edit/Edit":183,"./view/View":191,"react/addons":8}],182:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -27105,6 +27105,8 @@ module.exports = Time;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var TaskInlineEdit = require("./TaskInlineEdit");
+var classNames = require("classnames");
 
 var Details = React.createClass({
   displayName: "Details",
@@ -27113,24 +27115,73 @@ var Details = React.createClass({
     return "";
   },
 
-  fetchSubtasks: function fetchSubtasks(task) {
+  onClickStats: function onClickStats() {},
+
+  onClickSettings: function onClickSettings() {},
+
+  onClickHelp: function onClickHelp() {},
+
+  completeMainTask: function completeMainTask() {
 
     var self = this;
-    background.fetchSubtasks(task.id).always(function (subTasks) {
+    background.fetchTask(function (task) {
+      background.updateTask(task, { completed: !self.props.task.completed }).always(function () {
+        self.props.onUpdateTask();
+        self.state.subTasks.map(function (subtask) {
+          self.toggleSubtask(subtask, true);
+        });
+      });
+    });
+  },
+
+  updateTaskTitle: function updateTaskTitle(newTitle) {
+
+    var self = this;
+    background.updateTask(self.props.task, { title: newTitle }).always(function () {
+      self.props.onUpdateTask();
+    });
+  },
+
+  updateSubtaskTitle: function updateSubtaskTitle(subtask, newTitle) {
+
+    var self = this;
+    background.updateSubtask(subtask, { title: newTitle }).always(self.fetchSubtasks, self);
+  },
+
+  toggleSubtask: function toggleSubtask(subtask, override) {
+
+    var self = this;
+    var shouldComplete = override === true ? true : !subtask.completed;
+    background.updateSubtask(subtask, { completed: shouldComplete }).always(self.fetchSubtasks, self);
+  },
+
+  fetchSubtasks: function fetchSubtasks() {
+
+    var self = this;
+    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
       subTasks = subTasks || [];
       self.setState({
         subTasks: subTasks });
     });
   },
 
+  taskStyles: function taskStyles(task) {
+
+    return classNames("pictogram-icon", "wundercon", "gray", "mr1", {
+      "icon-checkbox-filled": task.completed,
+      "icon-checkbox": !task.completed
+    });
+  },
+
   renderSubtasks: function renderSubtasks() {
 
-    return this.state.subTasks.map(function (subtask) {
+    var self = this;
+    return self.state.subTasks.map(function (subtask) {
+      var classList = self.taskStyles(subtask);
       return React.createElement(
         "li",
         { key: subtask.id, value: subtask.id },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
-        subtask.title
+        React.createElement(TaskInlineEdit, { className: classList, onClick: self.toggleSubtask.bind(self, subtask), updateValue: self.updateSubtaskTitle.bind(self, subtask), title: subtask.title })
       );
     });
   },
@@ -27140,7 +27191,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     if (task) {
-      self.fetchSubtasks(task);
+      self.fetchSubtasks();
     }
   },
 
@@ -27156,10 +27207,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
-    // get remaining time
-    // separate main task from steps
-    // add links
-    // add editing
+    var classList = self.taskStyles(task);
 
     return React.createElement(
       "div",
@@ -27177,12 +27225,7 @@ var Details = React.createClass({
       React.createElement(
         "div",
         { className: "content-wrapper" },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-checkbox gray mr1" }),
-        React.createElement(
-          "h2",
-          { className: "inline-block m0 mb1 main-task" },
-          task.title
-        ),
+        React.createElement(TaskInlineEdit, { className: classList, textClasses: "main-task mb1 inline-block", onClick: self.completeMainTask, updateValue: self.updateTaskTitle, title: task.title }),
         React.createElement(
           "ul",
           { className: "subtasks list-reset" },
@@ -27191,9 +27234,9 @@ var Details = React.createClass({
         React.createElement(
           "div",
           { className: "options" },
-          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options" }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last" })
+          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickSettings }),
+          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
         )
       )
     );
@@ -27203,7 +27246,7 @@ var Details = React.createClass({
 module.exports = Details;
 
 
-},{"react/addons":8}],188:[function(require,module,exports){
+},{"./TaskInlineEdit":190,"classnames":1,"react/addons":8}],188:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -27252,6 +27295,73 @@ module.exports = Stats;
 },{"react/addons":8}],190:[function(require,module,exports){
 "use strict";
 
+var React = require("react/addons");
+var chrome = window.chrome;
+var background = chrome.extension.getBackgroundPage();
+
+var TaskInlineEdit = React.createClass({
+  displayName: "TaskInlineEdit",
+
+  enterEditMode: function enterEditMode() {
+
+    this.setState({
+      editMode: true
+    });
+  },
+
+  updateValue: function updateValue(ev) {
+
+    var self = this;
+    self.props.updateValue(ev.target.value);
+    self.exitEditMode();
+  },
+
+  exitEditMode: function exitEditMode() {
+
+    this.setState({
+      editMode: false
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      editMode: false
+    };
+  },
+
+  render: function render() {
+
+    var self = this;
+    var props = self.props;
+
+    if (self.state.editMode === true) {
+      return React.createElement(
+        "span",
+        null,
+        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title })
+      );
+    } else {
+      return React.createElement(
+        "span",
+        null,
+        React.createElement("a", { className: props.className, onClick: props.onClick }),
+        React.createElement(
+          "span",
+          { className: props.textClasses, onClick: self.enterEditMode },
+          props.title
+        )
+      );
+    }
+  }
+});
+
+module.exports = TaskInlineEdit;
+
+
+},{"react/addons":8}],191:[function(require,module,exports){
+"use strict";
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var React = require("react/addons");
@@ -27293,6 +27403,11 @@ var View = React.createClass({
     };
   },
 
+  setTask: function setTask() {
+
+    this.props.onComplete();
+  },
+
   render: function render() {
 
     var self = this;
@@ -27308,7 +27423,7 @@ var View = React.createClass({
         subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
         break;
       default:
-        subview = React.createElement(Details, props);
+        subview = React.createElement(Details, _extends({}, props, { onUpdateTask: self.setTask }));
     }
 
     return React.createElement(
@@ -27322,7 +27437,7 @@ var View = React.createClass({
 module.exports = View;
 
 
-},{"../../actions/appActions":180,"./Details":187,"./Options":188,"./Stats":189,"react/addons":8}],191:[function(require,module,exports){
+},{"../../actions/appActions":180,"./Details":187,"./Options":188,"./Stats":189,"react/addons":8}],192:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -27358,7 +27473,7 @@ background.fetchToken(function (accessToken) {
 });
 
 
-},{"./components/BrowserActionApp":181,"./stores/applicationState":195,"react/addons":8}],192:[function(require,module,exports){
+},{"./components/BrowserActionApp":181,"./stores/applicationState":196,"react/addons":8}],193:[function(require,module,exports){
 "use strict";
 
 /**
@@ -27404,7 +27519,7 @@ module.exports = {
 };
 
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -27492,7 +27607,7 @@ _.extend(BaseStore.prototype, {
 module.exports = BaseStore;
 
 
-},{"./constants":196,"events":2,"util":6}],194:[function(require,module,exports){
+},{"./constants":197,"events":2,"util":6}],195:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -27566,7 +27681,7 @@ _.extend(KeyValueStore.prototype, {
 module.exports = KeyValueStore;
 
 
-},{"./BaseStore":193,"util":6}],195:[function(require,module,exports){
+},{"./BaseStore":194,"util":6}],196:[function(require,module,exports){
 "use strict";
 
 var util = require("util");
@@ -27582,7 +27697,7 @@ util.inherits(ApplicationState, KeyValueStore);
 module.exports = new ApplicationState();
 
 
-},{"./KeyValueStore":194,"util":6}],196:[function(require,module,exports){
+},{"./KeyValueStore":195,"util":6}],197:[function(require,module,exports){
 "use strict";
 
 module.exports = {
@@ -27590,4 +27705,4 @@ module.exports = {
 };
 
 
-},{}]},{},[191])
+},{}]},{},[192])

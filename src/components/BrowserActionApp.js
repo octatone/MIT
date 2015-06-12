@@ -103,7 +103,7 @@ var BrowserActionApp = React.createClass({
       return <Edit {...props} {...state} onComplete={self.fetchTaskData}/>;
     }
     else if (loggedIn && taskDefined) {
-      return <View {...props} {...state}/>;
+      return <View {...props} {...state} onComplete={self.fetchTaskData}/>;
     }
     else {
       return <Login/>;

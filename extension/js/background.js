@@ -156,6 +156,7 @@ function fetchToken (callback) {
 function fetchTask (callback) {
 
   storage.get(['taskID'], function (data) {
+
     var taskID = data.taskID;
 
     if (!taskID) {
@@ -246,7 +247,18 @@ function createSubtask (subtaskTitle, taskID) {
   });
 }
 
+function updateTask (task, data) {
+
+  return getService('tasks').update(task.id, task.revision, data);
+}
+
+function updateSubtask (subtask, data) {
+
+  return getService('subtasks').update(subtask.id, subtask.revision, data);
+}
+
 function fetchSubtasks (taskID) {
+
   return getService('subtasks').forTask(taskID);
 }
 

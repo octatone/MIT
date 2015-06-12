@@ -3,6 +3,8 @@
 var React = require('react/addons');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var TaskInlineEdit = require('./TaskInlineEdit');
+var classNames = require('classnames');
 
 var Details = React.createClass({
 
@@ -10,10 +12,56 @@ var Details = React.createClass({
     return '';
   },
 
-  'fetchSubtasks': function (task) {
+  'onClickStats': function () {
+
+  },
+
+  'onClickSettings': function () {
+
+  },
+
+  'onClickHelp': function () {
+
+  },
+
+  'completeMainTask': function () {
 
     var self = this;
-    background.fetchSubtasks(task.id).always(function (subTasks) {
+    background.fetchTask(function (task) {
+      background.updateTask(task, {'completed':!self.props.task.completed}).always(function () {
+        self.props.onUpdateTask();
+        self.state.subTasks.map(function (subtask) {
+          self.toggleSubtask(subtask, true);
+        });
+      });
+    });
+  },
+
+  'updateTaskTitle': function (newTitle) {
+
+    var self = this;
+    background.updateTask(self.props.task, {'title':newTitle}).always(function () {
+      self.props.onUpdateTask();
+    });
+  },
+
+  'updateSubtaskTitle': function (subtask, newTitle) {
+
+    var self = this;
+    background.updateSubtask(subtask, {'title':newTitle}).always(self.fetchSubtasks, self);
+  },
+
+  'toggleSubtask': function (subtask, override) {
+
+    var self = this;
+    var shouldComplete = override === true ? true: !subtask.completed;
+    background.updateSubtask(subtask, {'completed':shouldComplete}).always(self.fetchSubtasks, self);
+  },
+
+  'fetchSubtasks': function () {
+
+    var self = this;
+    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
       subTasks = subTasks || [];
       self.setState({
         'subTasks': subTasks,
@@ -21,12 +69,23 @@ var Details = React.createClass({
     });
   },
 
+  'taskStyles': function (task) {
+
+    return classNames(
+      'pictogram-icon', 'wundercon', 'gray', 'mr1',
+      {
+        'icon-checkbox-filled': task.completed,
+        'icon-checkbox': !task.completed
+    });
+  },
+
   'renderSubtasks': function () {
 
-    return this.state.subTasks.map(function (subtask) {
+    var self = this;
+    return self.state.subTasks.map(function (subtask) {
+      var classList = self.taskStyles(subtask);
       return <li key={subtask.id} value={subtask.id}>
-                <a className="pictogram-icon wundercon icon-checkbox gray mr1"></a>
-                {subtask.title}
+               <TaskInlineEdit className={classList} onClick={self.toggleSubtask.bind(self, subtask)} updateValue={self.updateSubtaskTitle.bind(self, subtask)} title={subtask.title}/>
              </li>;
     });
   },
@@ -36,7 +95,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     if (task) {
-      self.fetchSubtasks(task);
+      self.fetchSubtasks();
     }
   },
 
@@ -52,10 +111,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
-    // get remaining time
-    // separate main task from steps
-    // add links
-    // add editing
+    var classList = self.taskStyles(task);
 
     return (
       <div className="details container">
@@ -64,16 +120,15 @@ var Details = React.createClass({
           <h2>You have 3 days and 4 hours to get your task done.</h2>
         </div>
         <div className="content-wrapper">
-          <a className="pictogram-icon wundercon icon-checkbox gray mr1"></a>
-          <h2 className="inline-block m0 mb1 main-task">{task.title}</h2>
+          <TaskInlineEdit className={classList} textClasses="main-task mb1 inline-block" onClick={self.completeMainTask} updateValue={self.updateTaskTitle} title={task.title}/>
           <ul className="subtasks list-reset">
             {renderedSubtasks}
           </ul>
 
           <div className="options">
-            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options"></a>
-            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options"></a>
-            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last"></a>
+            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
+            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickSettings}></a>
+            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
           </div>
         </div>
       </div>
