@@ -27124,10 +27124,12 @@ var Details = React.createClass({
   completeMainTask: function completeMainTask() {
 
     var self = this;
-    background.updateTask(self.props.task, { completed: !self.props.task.completed }).always(function () {
-      self.props.onUpdateTask();
-      self.state.subTasks.map(function (subtask) {
-        self.toggleSubtask(subtask, true);
+    background.fetchTask(function (task) {
+      background.updateTask(task, { completed: !self.props.task.completed }).always(function () {
+        self.props.onUpdateTask();
+        self.state.subTasks.map(function (subtask) {
+          self.toggleSubtask(subtask, true);
+        });
       });
     });
   },
