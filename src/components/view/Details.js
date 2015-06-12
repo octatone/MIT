@@ -53,7 +53,7 @@ var Details = React.createClass({
 
     var self = this;
     var shouldComplete = override === true ? true: !subtask.completed;
-    background.updateSubtask(subtask, {'complete':shouldComplete}).always(self.fetchSubtasks.bind(self));
+    background.updateSubtask(subtask, {'completed':shouldComplete}).always(self.fetchSubtasks, self);
   },
 
   'fetchSubtasks': function () {
@@ -67,17 +67,21 @@ var Details = React.createClass({
     });
   },
 
+  'taskStyles': function (task) {
+
+    return classNames(
+      'pictogram-icon', 'wundercon', 'gray', 'mr1',
+      {
+        'icon-checkbox-filled': task.completed,
+        'icon-checkbox': !task.completed
+    });
+  },
+
   'renderSubtasks': function () {
 
     var self = this;
     return self.state.subTasks.map(function (subtask) {
-      var classList = classNames(
-        'pictogram-icon', 'wundercon'. 'gray', 'mr1',
-        {
-          'icon-checkbox-filled': subtask.completed,
-          'icon-checkbox': !subtask.completed
-      });
-
+      var classList = self.taskStyles(subtask);
       return <li key={subtask.id} value={subtask.id}>
                <TaskInlineEdit className={classList} onClick={self.toggleSubtask.bind(self, subtask)} updateValue={self.updateSubtaskTitle.bind(self, subtask)} title={subtask.title}/>
              </li>;
@@ -105,12 +109,7 @@ var Details = React.createClass({
     var self = this;
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
-    var classList = classNames(
-        'pictogram-icon', 'wundercon'. 'gray', 'mr1',
-        {
-          'icon-checkbox-filled': task.completed,
-          'icon-checkbox': !task.completed
-      });
+    var classList = self.taskStyles(task);
 
     return (
       <div className="details container">

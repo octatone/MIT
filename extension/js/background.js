@@ -248,7 +248,7 @@ function createSubtask (subtaskTitle, taskID) {
 }
 
 function updateTask (task, data) {
-  console.log(data)
+
   return getService('tasks').update(task.id, task.revision, data);
 }
 

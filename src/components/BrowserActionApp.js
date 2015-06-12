@@ -80,6 +80,7 @@ var BrowserActionApp = React.createClass({
 
     var self = this;
     background.fetchTask(function (task) {
+      console.log(task)
       self.setProps({
         'task': task
       });
