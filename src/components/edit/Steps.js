@@ -67,6 +67,11 @@ var Steps = React.createClass({
     });
   },
 
+  'focus': function () {
+
+    React.findDOMNode(this.refs.stepInput).focus();
+  },
+
   'getInitialState': function () {
 
     return {
@@ -96,6 +101,7 @@ var Steps = React.createClass({
           </h4>
 
           <input
+            ref="stepInput"
             value={stepTitle}
             className="step-input block inline-block field-light px1 mt1 mb1"
             placeholder="Add a step"

@@ -23076,24 +23076,54 @@ var when = wunderbits.core.lib.when;
 var Edit = React.createClass({
   displayName: "Edit",
 
+  transitionEnded: function transitionEnded() {
+
+    var self = this;
+    self.transitionCallbacks.forEach(function (callback) {
+
+      callback();
+    });
+    self.transitionCallbacks = [];
+  },
+
+  onTransitionEnd: function onTransitionEnd(callback) {
+
+    this.transitionCallbacks.push(callback);
+  },
+
   showTaskEdit: function showTaskEdit() {
 
-    this.setState({
+    var self = this;
+    self.setState({
       subview: "task"
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.taskEdit.focus();
+      });
     });
   },
 
   showStepsEdit: function showStepsEdit() {
 
-    this.setState({
+    var self = this;
+    self.setState({
       subview: "steps"
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.stepsEdit.focus();
+      });
     });
   },
 
   showTimeEdit: function showTimeEdit() {
 
-    this.setState({
+    var self = this;
+    self.setState({
       subview: "time"
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.timeEdit.focus();
+      });
     });
   },
 
@@ -23159,6 +23189,17 @@ var Edit = React.createClass({
     };
   },
 
+  componentWillMount: function componentWillMount() {
+
+    this.transitionCallbacks = [];
+  },
+
+  componentDidMount: function componentDidMount() {
+
+    var self = this;
+    React.findDOMNode(self.refs.edit).addEventListener("transitionend", self.transitionEnded, false);
+  },
+
   render: function render() {
 
     var self = this;
@@ -23191,21 +23232,21 @@ var Edit = React.createClass({
 
     return React.createElement(
       "div",
-      { className: editClasses },
+      { ref: "edit", className: editClasses },
       React.createElement(
         "div",
         { className: taskClasses },
-        React.createElement(Task, _extends({}, props, { onDone: self.onTaskDone }))
+        React.createElement(Task, _extends({ ref: "taskEdit" }, props, { onDone: self.onTaskDone }))
       ),
       React.createElement(
         "div",
         { className: stepsClasses },
-        React.createElement(Steps, _extends({}, props, { onDone: self.onStepsDone, onBack: self.onStepsBack }))
+        React.createElement(Steps, _extends({ ref: "stepsEdit" }, props, { onDone: self.onStepsDone, onBack: self.onStepsBack }))
       ),
       React.createElement(
         "div",
         { className: timeClasses },
-        React.createElement(Time, _extends({}, props, { onDone: self.onTimeDone, onBack: self.onTimeBack }))
+        React.createElement(Time, _extends({ ref: "timeEdit" }, props, { onDone: self.onTimeDone, onBack: self.onTimeBack }))
       )
     );
   }
@@ -23291,6 +23332,11 @@ var Steps = React.createClass({
     });
   },
 
+  focus: function focus() {
+
+    React.findDOMNode(this.refs.stepInput).focus();
+  },
+
   getInitialState: function getInitialState() {
 
     return {
@@ -23327,6 +23373,7 @@ var Steps = React.createClass({
           "Break this to do down into small steps"
         ),
         React.createElement("input", {
+          ref: "stepInput",
           value: stepTitle,
           className: "step-input block inline-block field-light px1 mt1 mb1",
           placeholder: "Add a step",
@@ -23425,15 +23472,23 @@ var Task = React.createClass({
 
   onCreateNewClicked: function onCreateNewClicked() {
 
-    this.setState({
+    var self = this;
+    self.setState({
       entryMode: "createNew"
+    }, function () {
+
+      self.focus();
     });
   },
 
   onChooseExistingClicked: function onChooseExistingClicked() {
 
-    this.setState({
+    var self = this;
+    self.setState({
       entryMode: "chooseExisting"
+    }, function () {
+
+      self.focus();
     });
   },
 
@@ -23456,6 +23511,16 @@ var Task = React.createClass({
       listID: state.selectedList,
       createTask: state.entryMode === "createNew"
     });
+  },
+
+  focus: function focus() {
+
+    var self = this;
+    var state = self.state;
+    if (state.entryMode) {
+      var ref = state.entryMode === "createNew" ? self.refs.createNew : self.refs.selectList;
+      React.findDOMNode(ref).focus();
+    }
   },
 
   renderTaskOptions: function renderTaskOptions() {
@@ -23531,6 +23596,9 @@ var Task = React.createClass({
     var buttonContainerClasses = classNames("button-wrapper", {
       "display-none": !state.entryMode
     });
+    var nextButtonClasses = classNames("bg-blue", "left-align", "white", "next", {
+      muted: !ready
+    });
 
     return React.createElement(
       "div",
@@ -23577,9 +23645,9 @@ var Task = React.createClass({
           React.createElement(
             "select",
             {
+              ref: "selectList",
               onChange: this.onListSelectChange,
-              className: "lists block px1 full-width"
-            },
+              className: "lists block px1 full-width" },
             listOptions
           )
         ),
@@ -23604,6 +23672,7 @@ var Task = React.createClass({
           "div",
           { className: createNewContainerClasses },
           React.createElement("input", {
+            ref: "createNew",
             className: "task block fit-width field-light px1",
             placeholder: "Add the most important thing",
             onChange: self.onTaskInputChange })
@@ -23622,7 +23691,7 @@ var Task = React.createClass({
           React.createElement(
             "button",
             {
-              className: "bg-blue left-align white next",
+              className: nextButtonClasses,
               onClick: self.onClickDone,
               disabled: !ready },
             "Next"
@@ -23642,6 +23711,7 @@ module.exports = Task;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var classNames = require("classnames");
 
 var Time = React.createClass({
   displayName: "Time",
@@ -23670,6 +23740,11 @@ var Time = React.createClass({
     });
   },
 
+  focus: function focus() {
+
+    React.findDOMNode(this.refs.dateInput).focus();
+  },
+
   getInitialState: function getInitialState() {
 
     return {
@@ -23683,6 +23758,9 @@ var Time = React.createClass({
     var self = this;
     var state = self.state;
     var ready = !!(state.date && state.time);
+    var nextButtonClasses = classNames("bg-blue", "left-align", "white", "next", {
+      muted: !ready
+    });
 
     return React.createElement(
       "div",
@@ -23709,6 +23787,7 @@ var Time = React.createClass({
           "div",
           { className: "fake-input mt1 mb1" },
           React.createElement("input", {
+            ref: "dateInput",
             onChange: self.onChangeDate,
             type: "date",
             className: "due-date inline-block half-width" }),
@@ -23734,7 +23813,7 @@ var Time = React.createClass({
             {
               disabled: !ready,
               onClick: self.onClickNext,
-              className: "bg-blue left-align white next" },
+              className: nextButtonClasses },
             "Next"
           )
         )
@@ -23746,7 +23825,7 @@ var Time = React.createClass({
 module.exports = Time;
 
 
-},{"react/addons":7}],186:[function(require,module,exports){
+},{"classnames":1,"react/addons":7}],186:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");

@@ -50,15 +50,23 @@ var Task = React.createClass({
 
   'onCreateNewClicked': function () {
 
-    this.setState({
+    var self = this;
+    self.setState({
       'entryMode': 'createNew'
+    }, function () {
+
+      self.focus();
     });
   },
 
   'onChooseExistingClicked': function () {
 
-    this.setState({
+    var self = this;
+    self.setState({
       'entryMode': 'chooseExisting'
+    }, function () {
+
+      self.focus();
     });
   },
 
@@ -81,6 +89,16 @@ var Task = React.createClass({
       'listID': state.selectedList,
       'createTask': state.entryMode === 'createNew'
     });
+  },
+
+  'focus': function () {
+
+    var self = this;
+    var state = self.state;
+    if (state.entryMode) {
+      var ref = state.entryMode === 'createNew' ? self.refs.createNew : self.refs.selectList;
+      React.findDOMNode(ref).focus();
+    }
   },
 
   'renderTaskOptions': function () {
@@ -150,6 +168,11 @@ var Task = React.createClass({
       {
         'display-none': !state.entryMode
     });
+    var nextButtonClasses = classNames(
+      'bg-blue', 'left-align', 'white', 'next',
+      {
+        'muted': !ready
+    })
 
     return (
       <div className="task-choice container">
@@ -165,22 +188,22 @@ var Task = React.createClass({
             <button
               onClick={self.onChooseExistingClicked}
               className="button mt2 mb1 button-outline blue full-width">
-              choose from existing
+                choose from existing
             </button>
             <button
               onClick={self.onCreateNewClicked}
               className="button button-outline blue full-width">
-              add something new
+                add something new
             </button>
           </div>
 
           <div className={chooseListContainerClasses}>
             <h4 className="subheading">Choose a list</h4>
             <select
+              ref="selectList"
               onChange={this.onListSelectChange}
-              className="lists block px1 full-width"
-            >
-              {listOptions}
+              className="lists block px1 full-width">
+                {listOptions}
             </select>
           </div>
 
@@ -192,12 +215,13 @@ var Task = React.createClass({
               onChange={self.onTaskInputChange}
               className="tasks block px1 full-width"
               disabled={!hasTasks}>
-              {taskOptions}
+                {taskOptions}
             </select>
           </div>
 
           <div className={createNewContainerClasses}>
             <input
+              ref="createNew"
               className="task block fit-width field-light px1"
               placeholder="Add the most important thing"
               onChange={self.onTaskInputChange}/>
@@ -211,10 +235,10 @@ var Task = React.createClass({
             </button>
             <span className="pictogram-icon wundercon icon-back white"></span>
             <button
-              className="bg-blue left-align white next"
+              className={nextButtonClasses}
               onClick={self.onClickDone}
               disabled={!ready}>
-              Next
+                Next
             </button>
           </div>
         </div>

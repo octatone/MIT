@@ -14,25 +14,54 @@ var when = wunderbits.core.lib.when;
 
 var Edit = React.createClass({
 
+  'transitionEnded': function () {
+
+    var self = this;
+    self.transitionCallbacks.forEach(function (callback) {
+
+      callback();
+    });
+    self.transitionCallbacks = [];
+  },
+
+  'onTransitionEnd': function (callback) {
+
+    this.transitionCallbacks.push(callback);
+  },
 
   'showTaskEdit': function () {
 
-    this.setState({
+    var self = this;
+    self.setState({
       'subview': 'task'
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.taskEdit.focus();
+      });
     });
   },
 
   'showStepsEdit': function () {
 
-    this.setState({
+    var self = this;
+    self.setState({
       'subview': 'steps'
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.stepsEdit.focus();
+      });
     });
   },
 
   'showTimeEdit': function () {
 
-    this.setState({
+    var self = this;
+    self.setState({
       'subview': 'time'
+    }, function () {
+      self.onTransitionEnd(function () {
+        self.refs.timeEdit.focus();
+      });
     });
   },
 
@@ -98,6 +127,21 @@ var Edit = React.createClass({
     };
   },
 
+  'componentWillMount': function () {
+
+    this.transitionCallbacks = [];
+  },
+
+  'componentDidMount': function () {
+
+    var self = this;
+    React.findDOMNode(self.refs.edit).addEventListener(
+      'transitionend',
+      self.transitionEnded,
+      false
+    );
+  },
+
   'render': function () {
 
     var self = this;
@@ -137,17 +181,17 @@ var Edit = React.createClass({
     });
 
     return (
-      <div className={editClasses}>
+      <div ref="edit" className={editClasses}>
         <div className={taskClasses}>
-          <Task {...props} onDone={self.onTaskDone}/>
+          <Task ref="taskEdit" {...props} onDone={self.onTaskDone}/>
         </div>
 
         <div className={stepsClasses}>
-          <Steps {...props} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
+          <Steps ref="stepsEdit" {...props} onDone={self.onStepsDone} onBack={self.onStepsBack}/>
         </div>
 
         <div className={timeClasses}>
-          <Time {...props} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
+          <Time ref="timeEdit" {...props} onDone={self.onTimeDone} onBack={self.onTimeBack}/>
         </div>
       </div>
     );
