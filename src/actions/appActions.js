@@ -13,26 +13,36 @@ module.exports = {
 
   'setTaskID': function (taskID) {
 
+    var deferred = new WBDeferred();
+
     syncStorage.set({
       'taskID': taskID
     }, function () {
 
       applicationState.update('taskID', taskID);
+      deferred.resolve();
     });
+
+    return deferred.promise();
   },
 
   'createTaskAndSetTaskID': function (taskTitle, listID) {
 
     var self = this;
-    return background.createTask(taskTitle, listID)
+    var deferred = new WBDeferred();
+    background.createTask(taskTitle, listID)
       .done(function (task) {
 
-        self.setTaskID(task.id);
+        self.setTaskID(task.id)
+          .done(deferred.resolve, deferred);
       })
       .fail(function () {
 
         console.error(arguments);
+        deferred.reject();
       });
+
+    return deferred.promise();
   },
 
   'createSteps': function (stepTitles, taskID) {
@@ -71,7 +81,11 @@ module.exports = {
         });
     }
     else {
-      taskIDDeferred.resolve(taskID);
+      self.setTaskID(taskID)
+        .done(function () {
+
+          taskIDDeferred.resolve(taskID);
+        });
     }
 
     taskIDDeferred.done(function (taskID) {
