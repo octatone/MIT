@@ -13,6 +13,7 @@ var redirectURI = 'https://nkfmkemlekipdmmkemlpmolpffhdfkgj.chromiumapp.org/prov
 var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 
 var storage = chrome.storage.sync;
+var localStorage = chrome.storage.local;
 var timeout = 30 * 1000;
 
 var notifiedIds = {};
@@ -35,12 +36,42 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.notifications.onClicked.addListener(function (notificationID) {
 });
 
+function setActiveTab (url, callback) {
+  storage.set({'activeTab': url}, callback);
+}
+
+function getCurrentBrowseTime (url, callback) {
+  chrome.storage.local.get(url, callback);
+}
+
+function saveSiteData (url, currentSeconds) {
+
+  var saveData = {};
+  getCurrentBrowseTime(url, function (data) {
+    var currentAmmount = data[url];
+    saveData[url] = currentAmmount ? currentAmmount + currentSeconds: 0;
+    console.log(currentSeconds)
+    chrome.storage.local.set(saveData);
+    console.log(saveData)
+  });
+}
+
+function extractDomain (url) {
+  var a = document.createElement('a');
+  a.href = url;
+  return a.hostname;
+}
+
 chrome.tabs.onActivated.addListener(function (tabData) {
+  // var currentSeconds = moment().seconds(); track seconds!
   chrome.tabs.get(tabData.tabId, function (tabInfo) {
-    var url = tabInfo.url;
-    // extract domain
+    var url = extractDomain(tabInfo.url);
+    setActiveTab(url, function () {
+      saveSiteData(url, currentSeconds);
+    });
     // track time on each page
     // trigger notification page when time threshold is met
+    // when task is completed, reset all counters
   });
 });
 
