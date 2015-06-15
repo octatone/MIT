@@ -41,18 +41,11 @@ var BrowserActionApp = React.createClass({
                     storageChange.newValue);
       }
 
-      if (changes.accessToken) {
+      if ('accessToken' in changes) {
         self.onChangeAccessToken(changes.accessToken.newValue);
       }
-    });
-
-    chrome.runtime.onMessage.addListener(function (request, sender) {
-
-      console.log(sender.tab ?
-                  "from a content script:" + sender.tab.url :
-                  "from the extension");
-
-      if (request.notifications === 'update') {
+      else if ('exchangingCode' in changes) {
+        self.onChangeExchangingCode(changes.exchangingCode.newValue);
       }
     });
   },
@@ -66,6 +59,13 @@ var BrowserActionApp = React.createClass({
         'lists': lists || [],
         'loggedIn': !!accessToken
       });
+    });
+  },
+
+  'onChangeExchangingCode': function (exchangingCode) {
+
+    this.setProps({
+      'exchangingCode': exchangingCode
     });
   },
 
@@ -106,7 +106,7 @@ var BrowserActionApp = React.createClass({
       return <View {...props} {...state} onComplete={self.fetchTaskData}/>;
     }
     else {
-      return <Login/>;
+      return <Login {...props} {...state}/>;
     }
   }
 });

@@ -26121,16 +26121,11 @@ var BrowserActionApp = React.createClass({
         console.log("Storage key \"%s\" in namespace \"%s\" changed. " + "Old value was \"%s\", new value is \"%s\".", key, namespace, storageChange.oldValue, storageChange.newValue);
       }
 
-      if (changes.accessToken) {
+      if ("accessToken" in changes) {
         self.onChangeAccessToken(changes.accessToken.newValue);
+      } else if ("exchangingCode" in changes) {
+        self.onChangeExchangingCode(changes.exchangingCode.newValue);
       }
-    });
-
-    chrome.runtime.onMessage.addListener(function (request, sender) {
-
-      console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-
-      if (request.notifications === "update") {}
     });
   },
 
@@ -26143,6 +26138,13 @@ var BrowserActionApp = React.createClass({
         lists: lists || [],
         loggedIn: !!accessToken
       });
+    });
+  },
+
+  onChangeExchangingCode: function onChangeExchangingCode(exchangingCode) {
+
+    this.setProps({
+      exchangingCode: exchangingCode
     });
   },
 
@@ -26181,7 +26183,7 @@ var BrowserActionApp = React.createClass({
     } else if (loggedIn && taskDefined) {
       return React.createElement(View, _extends({}, props, state, { onComplete: self.fetchTaskData }));
     } else {
-      return React.createElement(Login, null);
+      return React.createElement(Login, _extends({}, props, state));
     }
   }
 });
@@ -26195,17 +26197,54 @@ module.exports = BrowserActionApp;
 var React = require("react/addons");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+var classNames = require("classnames");
+
+var messages = {
+  loggingIn: "Launching Wunderlist login ...",
+  exchangingCode: "Almost done ..."
+};
 
 var Login = React.createClass({
   displayName: "Login",
 
   login: function login() {
 
-    console.log("login clicked");
     background.login();
+    this.setState({
+      state: "loggingIn"
+    });
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+
+    if (nextProps.exchangingCode) {
+      this.setState({
+        state: "exchangingCode"
+      });
+    }
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      state: this.props.exchangingCode ? "exchangingCode" : undefined
+    };
   },
 
   render: function render() {
+
+    var self = this;
+    var state = self.state;
+
+    var buttonClasses = classNames("button bg-green white", {
+      "display-none": state.state !== undefined
+    });
+
+    var messageClasses = classNames({
+      "display-none": state.state === undefined
+    });
+
+    var message = messages[state.state];
 
     return React.createElement(
       "div",
@@ -26231,9 +26270,14 @@ var Login = React.createClass({
         React.createElement(
           "button",
           {
-            className: "button bg-green white",
+            className: buttonClasses,
             onClick: this.login },
           "Login"
+        ),
+        React.createElement(
+          "div",
+          { className: messageClasses },
+          message
         )
       )
     );
@@ -26243,7 +26287,7 @@ var Login = React.createClass({
 module.exports = Login;
 
 
-},{"react/addons":8}],183:[function(require,module,exports){
+},{"classnames":1,"react/addons":8}],183:[function(require,module,exports){
 "use strict";
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -27448,27 +27492,30 @@ var mountNode = document.getElementById("react-main-mount");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
-function renderApp(lists, task, accessToken) {
+function renderApp(lists, task, storageData) {
+
+  storageData = storageData || {};
 
   var browserActionApp = new BrowserActionApp({
     lists: lists || [],
-    loggedIn: !!accessToken,
-    task: task
+    task: task,
+    loggedIn: !!storageData.accessToken,
+    exchangingCode: !!storageData.exchangingCode
   });
 
   React.render(browserActionApp, mountNode);
 }
 
-background.fetchToken(function (accessToken) {
+background.fetchData(function (storageData) {
 
-  if (accessToken) {
+  if (storageData.accessToken) {
     background.fetchLists().always(function (lists) {
       background.fetchTask(function (task) {
-        renderApp(lists, task, accessToken);
+        renderApp(lists, task, storageData);
       });
     });
   } else {
-    renderApp();
+    renderApp(undefined, undefined, storageData);
   }
 });
 
