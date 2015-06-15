@@ -27354,7 +27354,7 @@ var TaskInlineEdit = React.createClass({
       return React.createElement(
         "span",
         null,
-        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title })
+        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title, className: "editMode gray" })
       );
     } else {
       return React.createElement(

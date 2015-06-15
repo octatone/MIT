@@ -35,9 +35,13 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.notifications.onClicked.addListener(function (notificationID) {
 });
 
-
-chrome.tabs.onActivated.addListener(function () {
-  console.log(arguments)
+chrome.tabs.onActivated.addListener(function (tabData) {
+  chrome.tabs.get(tabData.tabId, function (tabInfo) {
+    var url = tabInfo.url;
+    // extract domain
+    // track time on each page
+    // trigger notification page when time threshold is met
+  });
 });
 
 function getParams (uri) {

@@ -135,6 +135,17 @@ input[type="time"] {
   text-align: center;
 }
 
+.editMode {
+  padding: 5px 5px 5px 30px;
+  border:1px solid #ccc;
+  border-radius: 4px;
+  background: none;
+  border-style: solid;
+  border-width: 1px;
+  height: 12px
+  font-size: 14px;
+}
+
 select {
   background-color: #fff;
   appearance: menulist-button !important;
@@ -252,7 +263,6 @@ button.bg-blue.next {
   border-style: solid;
   border-width: 1px;
   border-color: #ccc;
-
 }
 
 .fake-input input {
