@@ -35,6 +35,11 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.notifications.onClicked.addListener(function (notificationID) {
 });
 
+
+chrome.tabs.onActivated.addListener(function () {
+  console.log(arguments)
+});
+
 function getParams (uri) {
 
   console.log(uri);

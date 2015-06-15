@@ -27107,6 +27107,8 @@ var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = require("./TaskInlineEdit");
 var classNames = require("classnames");
+var actions = require("../../actions/appActions");
+var moment = require("moment");
 
 var Details = React.createClass({
   displayName: "Details",
@@ -27195,6 +27197,19 @@ var Details = React.createClass({
     }
   },
 
+  getTimeString: function getTimeString() {
+
+    return actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        var daysLeft = "";
+
+        return "You have 3 days and 4 hours to get your task done.";
+      }
+    });
+  },
+
   getInitialState: function getInitialState() {
 
     return {
@@ -27246,7 +27261,7 @@ var Details = React.createClass({
 module.exports = Details;
 
 
-},{"./TaskInlineEdit":190,"classnames":1,"react/addons":8}],188:[function(require,module,exports){
+},{"../../actions/appActions":180,"./TaskInlineEdit":190,"classnames":1,"moment":7,"react/addons":8}],188:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");

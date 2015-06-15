@@ -5,6 +5,8 @@ var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = require('./TaskInlineEdit');
 var classNames = require('classnames');
+var actions = require('../../actions/appActions');
+var moment = require('moment');
 
 var Details = React.createClass({
 
@@ -97,6 +99,19 @@ var Details = React.createClass({
     if (task) {
       self.fetchSubtasks();
     }
+  },
+
+  'getTimeString': function () {
+
+    return actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        var daysLeft = '';
+
+        return 'You have 3 days and 4 hours to get your task done.'
+      }
+    });
   },
 
   'getInitialState': function () {
