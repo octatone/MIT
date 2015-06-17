@@ -85,7 +85,7 @@ function saveTokenData (data, callback) {
 function exchangeCode (code, callback) {
 
   storage.set({
-    'exchangingCode': true
+    'backgroundState': 'exchangingCode'
   }, function () {
 
     $.ajax(exchangeProxy + '/exchange', {
@@ -98,7 +98,7 @@ function exchangeCode (code, callback) {
     .always(function (response) {
 
       storage.set({
-        'exchangingCode': false
+        'backgroundState': undefined
       }, function () {
 
         if (response && response.access_token) {
@@ -116,15 +116,25 @@ function login () {
 
   var state = ''+ Math.random();
 
-  chrome.identity.launchWebAuthFlow({
-    'url': getAuthURL(state),
-    'interactive': true
-  }, function (redirectURL) {
+  storage.set({
+    'backgroundState': 'loggingIn'
+  }, function () {
 
-    var params = getParams(redirectURL);
-    if (params.state === state && params.code) {
-      exchangeCode(params.code);
-    }
+    chrome.identity.launchWebAuthFlow({
+      'url': getAuthURL(state),
+      'interactive': true
+    }, function (redirectURL) {
+
+      storage.set({
+        'backgroundState': undefined
+      }, function () {
+
+        var params = getParams(redirectURL);
+        if (params.state === state && params.code) {
+          exchangeCode(params.code);
+        }
+      });
+    });
   });
 }
 

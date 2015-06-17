@@ -26123,8 +26123,8 @@ var BrowserActionApp = React.createClass({
 
       if ("accessToken" in changes) {
         self.onChangeAccessToken(changes.accessToken.newValue);
-      } else if ("exchangingCode" in changes) {
-        self.onChangeExchangingCode(changes.exchangingCode.newValue);
+      } else if ("backgroundState" in changes) {
+        self.onChangeBackgroundState(changes.backgroundState.newValue);
       }
     });
   },
@@ -26141,10 +26141,10 @@ var BrowserActionApp = React.createClass({
     });
   },
 
-  onChangeExchangingCode: function onChangeExchangingCode(exchangingCode) {
+  onChangeBackgroundState: function onChangeBackgroundState(backgroundState) {
 
     this.setProps({
-      exchangingCode: exchangingCode
+      backgroundState: backgroundState
     });
   },
 
@@ -26217,17 +26217,15 @@ var Login = React.createClass({
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 
-    if (nextProps.exchangingCode) {
-      this.setState({
-        state: "exchangingCode"
-      });
-    }
+    this.setState({
+      state: nextProps.backgroundState
+    });
   },
 
   getInitialState: function getInitialState() {
 
     return {
-      state: this.props.exchangingCode ? "exchangingCode" : undefined
+      state: this.props.backgroundState
     };
   },
 
@@ -27500,7 +27498,7 @@ function renderApp(lists, task, storageData) {
     lists: lists || [],
     task: task,
     loggedIn: !!storageData.accessToken,
-    exchangingCode: !!storageData.exchangingCode
+    "backgroundState: ": storageData.backgroundState
   });
 
   React.render(browserActionApp, mountNode);

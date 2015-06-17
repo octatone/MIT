@@ -22,17 +22,15 @@ var Login = React.createClass({
 
   'componentWillReceiveProps': function (nextProps) {
 
-    if (nextProps.exchangingCode) {
-      this.setState({
-        'state': 'exchangingCode'
-      });
-    }
+    this.setState({
+      'state': nextProps.backgroundState
+    });
   },
 
   'getInitialState': function () {
 
     return {
-      'state': this.props.exchangingCode ? 'exchangingCode' : undefined
+      'state': this.props.backgroundState
     };
   },
 

@@ -44,8 +44,8 @@ var BrowserActionApp = React.createClass({
       if ('accessToken' in changes) {
         self.onChangeAccessToken(changes.accessToken.newValue);
       }
-      else if ('exchangingCode' in changes) {
-        self.onChangeExchangingCode(changes.exchangingCode.newValue);
+      else if ('backgroundState' in changes) {
+        self.onChangeBackgroundState(changes.backgroundState.newValue);
       }
     });
   },
@@ -62,10 +62,10 @@ var BrowserActionApp = React.createClass({
     });
   },
 
-  'onChangeExchangingCode': function (exchangingCode) {
+  'onChangeBackgroundState': function (backgroundState) {
 
     this.setProps({
-      'exchangingCode': exchangingCode
+      'backgroundState': backgroundState
     });
   },
 

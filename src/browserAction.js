@@ -16,7 +16,7 @@ function renderApp (lists, task, storageData) {
     'lists': lists || [],
     'task': task,
     'loggedIn': !!storageData.accessToken,
-    'exchangingCode': !!storageData.exchangingCode
+    'backgroundState: ': storageData.backgroundState
   });
 
   React.render(browserActionApp, mountNode);
