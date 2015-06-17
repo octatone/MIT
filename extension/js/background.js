@@ -44,17 +44,7 @@ function getCurrentBrowseTime (url, callback) {
   chrome.storage.local.get(url, callback);
 }
 
-function saveSiteData (url, currentSeconds) {
 
-  var saveData = {};
-  getCurrentBrowseTime(url, function (data) {
-    var currentAmmount = data[url];
-    saveData[url] = currentAmmount ? currentAmmount + currentSeconds: 0;
-    console.log(currentSeconds)
-    chrome.storage.local.set(saveData);
-    console.log(saveData)
-  });
-}
 
 function extractDomain (url) {
   var a = document.createElement('a');
@@ -62,18 +52,43 @@ function extractDomain (url) {
   return a.hostname;
 }
 
-chrome.tabs.onActivated.addListener(function (tabData) {
-  // var currentSeconds = moment().seconds(); track seconds!
-  chrome.tabs.get(tabData.tabId, function (tabInfo) {
-    var url = extractDomain(tabInfo.url);
-    setActiveTab(url, function () {
+// chrome.tabs.onActivated.addListener(function (tabData) {
+//   chrome.tabs.get(tabData.tabId, function (tabInfo) {
+//     var url = extractDomain(tabInfo.url);
+//     // track time on each page
+//     // trigger notification page when time threshold is met
+//     // when task is completed, reset all counters
+//   });
+// });
+
+function getCurrentSeconds (url, callback) {
+
+  chrome.storage.local.get(url, function (data) {
+    callback(data[url]);
+  });
+}
+
+function saveSiteData (url, currentSeconds) {
+
+  var saveData = {};
+  saveData[url] = currentSeconds;
+  chrome.storage.local.set(saveData);
+}
+
+function updateActiveTabDurations () {
+
+  chrome.tabs.query({active: true, windowType: 'normal'}, function (tabData) {
+    var url = extractDomain(tabData.url);
+    getCurrentSeconds(url, function (currentSeconds) {
+      currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
       saveSiteData(url, currentSeconds);
     });
-    // track time on each page
-    // trigger notification page when time threshold is met
-    // when task is completed, reset all counters
   });
-});
+}
+
+function checkActiveTabDurations () {
+
+}
 
 function getParams (uri) {
 
@@ -337,3 +352,8 @@ function updateIcon (unreadCount) {
     }
   });
 }
+
+setInterval(function () {
+  updateActiveTabDurations();
+  checkActiveTabDurations();
+}, 1000);
