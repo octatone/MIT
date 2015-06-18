@@ -22,6 +22,7 @@ var notifiedIds = {};
 var currentNotifications = [];
 var accessToken;
 var currentURL = '';
+var currentTabId = '';
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
@@ -80,18 +81,26 @@ function updateActiveTabDurations () {
     chrome.tabs.get(tabId, function (tabData) {
       var url = extractDomain(tabData.url);
       currentURL = url;
+      currentTabId = tabId;
       getCurrentSeconds(currentURL);
     });
   });
 
   if (!currentURL) {
     chrome.tabs.query({active: true, windowType: 'normal', lastFocusedWindow:true}, function (tabData) {
+      currentTabId = tabData.id;
       currentURL = extractDomain(tabData.url);
     });
   }
 
   getCurrentSeconds(currentURL);
 }
+
+chrome.tabs.onUpdated.addListener(function (tabId, changed) {
+  if (changed.url && currentTabId === tabId) {
+    currentURL = changed.url;
+  }
+});
 
 function getParams (uri) {
 
