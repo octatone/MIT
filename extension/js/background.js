@@ -15,6 +15,8 @@ var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 var storage = chrome.storage.sync;
 var localStorage = chrome.storage.local;
 var timeout = 30 * 1000;
+// CONFIGURE THIS!!!
+var threshold = 10;
 
 var notifiedIds = {};
 var currentNotifications = [];
@@ -37,30 +39,15 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 chrome.notifications.onClicked.addListener(function (notificationID) {
 });
 
-function setActiveTab (url, callback) {
-  storage.set({'activeTab': url}, callback);
-}
-
 function getCurrentBrowseTime (url, callback) {
   chrome.storage.local.get(url, callback);
 }
-
-
 
 function extractDomain (url) {
   var a = document.createElement('a');
   a.href = url;
   return a.hostname;
 }
-
-// chrome.tabs.onActivated.addListener(function (tabData) {
-//   chrome.tabs.get(tabData.tabId, function (tabInfo) {
-//     var url = extractDomain(tabInfo.url);
-//     // track time on each page
-//     // trigger notification page when time threshold is met
-//     // when task is completed, reset all counters
-//   });
-// });
 
 function getCurrentSeconds (url, callback) {
 
@@ -70,10 +57,20 @@ function getCurrentSeconds (url, callback) {
     var currentSeconds = domainTimes[url];
     currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
     domainTimes[url] = currentSeconds;
-    console.log(domainTimes)
     local.set({
       'domainTimes': domainTimes
     });
+
+    if (currentSeconds >= threshold) {
+      fetchTask(function (task) {
+        createNotification({
+          'url': url,
+          'id': task.id,
+          'title': task.title,
+          'body': 'You should probably get off of ' + url + ' and get back to ' + task.title
+        });
+      })
+    }
   });
 }
 
@@ -81,7 +78,6 @@ function updateActiveTabDurations () {
 
   chrome.tabs.onActiveChanged.addListener(function (tabId) {
     chrome.tabs.get(tabId, function (tabData) {
-
       var url = extractDomain(tabData.url);
       currentURL = url;
       getCurrentSeconds(currentURL);
@@ -243,6 +239,7 @@ function fetchTask (callback) {
       })
       .fail(function (resp, code) {
         console.error(resp, code);
+        callback();
       });
   });
 }
@@ -336,19 +333,31 @@ function fetchSubtasks (taskID) {
 
 function createNotification (data) {
 
-  chrome.notifications.create(
-    data.id,
-    {
-      'type': 'basic',
-      'iconUrl': '../icons/clock.png',
-      'title': 'You have the thing \"' data.title + '" that you wanted to get done.' ,
-      'message': data.body,
-      'contextMessage': data.title
-    },
-    function () {
-      chrome.runtime.lastError && console.error(chrome.runtime.lastError);
-    }
-  );
+  if (data.id) {
+    chrome.notifications.create(
+      data.url + '',
+      {
+        'type': 'basic',
+        'iconUrl': '../icons/clock.png',
+        'title': 'You have the thing "' + data.title + '" that you wanted to get done.' ,
+        'message': data.body,
+        'contextMessage': data.title
+      },
+      function () {
+        chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+      }
+    );
+
+    chrome.notifications.onClosed.addListener(function (notificationId) {
+      chrome.storage.local.get('domainTimes', function (data) {
+        var domainTimes = data.domainTimes;
+        domainTimes[notificationId] = 0;
+        chrome.storage.local.set({
+          'domainTimes': domainTimes
+        });
+      });
+    });
+  }
 }
 
 function updateBadge (unreadCount) {
