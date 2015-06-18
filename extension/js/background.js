@@ -19,6 +19,7 @@ var timeout = 30 * 1000;
 var notifiedIds = {};
 var currentNotifications = [];
 var accessToken;
+var currentURL = '';
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
@@ -63,31 +64,37 @@ function extractDomain (url) {
 
 function getCurrentSeconds (url, callback) {
 
-  chrome.storage.local.get(url, function (data) {
-    callback(data[url]);
-  });
-}
-
-function saveSiteData (url, currentSeconds) {
-
-  var saveData = {};
-  saveData[url] = currentSeconds;
-  chrome.storage.local.set(saveData);
-}
-
-function updateActiveTabDurations () {
-
-  chrome.tabs.query({active: true, windowType: 'normal'}, function (tabData) {
-    var url = extractDomain(tabData.url);
-    getCurrentSeconds(url, function (currentSeconds) {
-      currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
-      saveSiteData(url, currentSeconds);
+  var local = chrome.storage.local;
+  local.get('domainTimes', function (data) {
+    var domainTimes = data.domainTimes || {};
+    var currentSeconds = domainTimes[url];
+    currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
+    domainTimes[url] = currentSeconds;
+    console.log(domainTimes)
+    local.set({
+      'domainTimes': domainTimes
     });
   });
 }
 
-function checkActiveTabDurations () {
+function updateActiveTabDurations () {
 
+  chrome.tabs.onActiveChanged.addListener(function (tabId) {
+    chrome.tabs.get(tabId, function (tabData) {
+
+      var url = extractDomain(tabData.url);
+      currentURL = url;
+      getCurrentSeconds(currentURL);
+    });
+  });
+
+  if (!currentURL) {
+    chrome.tabs.query({active: true, windowType: 'normal', lastFocusedWindow:true}, function (tabData) {
+      currentURL = extractDomain(tabData.url);
+    });
+  }
+
+  getCurrentSeconds(currentURL);
 }
 
 function getParams (uri) {
@@ -355,5 +362,4 @@ function updateIcon (unreadCount) {
 
 setInterval(function () {
   updateActiveTabDurations();
-  checkActiveTabDurations();
 }, 1000);
