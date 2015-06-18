@@ -326,19 +326,19 @@ function fetchSubtasks (taskID) {
 
 function createNotification (data) {
 
-  // chrome.notifications.create(
-  //   data.id,
-  //   {
-  //     'type': 'basic',
-  //     'iconUrl': '../icons/reddit-alien.svg',
-  //     'title': data.subject + ' from ' + data.author,
-  //     'message': data.body,
-  //     'contextMessage': data.link_title
-  //   },
-  //   function () {
-  //     chrome.runtime.lastError && console.error(chrome.runtime.lastError);
-  //   }
-  // );
+  chrome.notifications.create(
+    data.id,
+    {
+      'type': 'basic',
+      'iconUrl': '../icons/clock.png',
+      'title': 'You have the thing \"' data.title + '" that you wanted to get done.' ,
+      'message': data.body,
+      'contextMessage': data.title
+    },
+    function () {
+      chrome.runtime.lastError && console.error(chrome.runtime.lastError);
+    }
+  );
 }
 
 function updateBadge (unreadCount) {
