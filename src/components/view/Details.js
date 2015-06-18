@@ -129,7 +129,7 @@ var Details = React.createClass({
     var classList = self.taskStyles(task);
 
     return (
-      <div className="details container">
+      <div className="details">
         <div className="header details">
           <span className="pictogram-icon wundercon icon-inbox"></span>
           <h2>You have 3 days and 4 hours to get your task done.</h2>
@@ -139,12 +139,6 @@ var Details = React.createClass({
           <ul className="subtasks list-reset">
             {renderedSubtasks}
           </ul>
-
-          <div className="options">
-            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
-            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickSettings}></a>
-            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
-          </div>
         </div>
       </div>
     );

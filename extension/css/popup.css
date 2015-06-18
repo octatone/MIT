@@ -103,7 +103,6 @@ body {
   padding: 1em;
   border-left:1px solid #ccc;
   border-right:1px solid #ccc;
-  border-bottom:1px solid #ccc;
 }
 
 .subheading {
@@ -296,9 +295,11 @@ button.bg-blue.next {
 
 .options {
   height: 20px;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #ccc;
+  padding: 1em;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0 0 6px 6px;
 }
 
 .bottom-options {
