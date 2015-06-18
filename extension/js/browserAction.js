@@ -27332,8 +27332,13 @@ module.exports = Options;
 "use strict";
 
 var React = require("react/addons");
+var classNames = require("classnames");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+
+var _naughtyDomains = ["reddit.com", "facebook.com", "slashdot.org", "news.ycombinator.com", "9gag.com"];
+
+var _naughtyPattern = new RegExp(_naughtyDomains.join("|"), "i");
 
 var Stats = React.createClass({
   displayName: "Stats",
@@ -27354,6 +27359,12 @@ var Stats = React.createClass({
       null,
       domains.map(function (domain) {
 
+        var isNaughty = _naughtyPattern.test(domain || "");
+        var domainClasses = classNames({
+          red: isNaughty,
+          bold: isNaughty
+        });
+
         var seconds = domainTimes[domain];
         var minutes = Math.floor(seconds / 60);
         seconds = seconds - minutes * 60;
@@ -27364,7 +27375,11 @@ var Stats = React.createClass({
           React.createElement(
             "div",
             { className: "col col-9 overflow-hidden" },
-            domain
+            React.createElement(
+              "span",
+              { className: domainClasses },
+              domain
+            )
           ),
           React.createElement(
             "div",
@@ -27407,7 +27422,7 @@ var Stats = React.createClass({
 module.exports = Stats;
 
 
-},{"react/addons":8}],190:[function(require,module,exports){
+},{"classnames":1,"react/addons":8}],190:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
