@@ -37,8 +37,6 @@ chrome.notifications.onClicked.addListener(function (notificationID) {
 
 function getParams (uri) {
 
-  console.log(uri);
-
   var params = {};
   var parts = uri.split('?');
   var queries = parts[1].split('&');
@@ -51,12 +49,6 @@ function getParams (uri) {
   });
 
   return params;
-}
-
-function getUserAgentString () {
-
-  var version = chrome.runtime.getManifest().version;
-  return 'chrome-extension:notifier-for-reddit:' + version + ' (by /u/octatone)';
 }
 
 function getAuthURL (state) {
@@ -92,21 +84,31 @@ function saveTokenData (data, callback) {
 
 function exchangeCode (code, callback) {
 
-  $.ajax(exchangeProxy + '/exchange', {
-    'type': 'POST',
-    'data': {
-      'code': code
-    },
-    'timeout': timeout
-  })
-  .always(function (response) {
+  storage.set({
+    'backgroundState': 'exchangingCode'
+  }, function () {
 
-    if (response && response.access_token) {
-      saveTokenData(response, function () {
+    $.ajax(exchangeProxy + '/exchange', {
+      'type': 'POST',
+      'data': {
+        'code': code
+      },
+      'timeout': timeout
+    })
+    .always(function (response) {
 
-        callback && callback(response.access_token);
+      storage.set({
+        'backgroundState': undefined
+      }, function () {
+
+        if (response && response.access_token) {
+          saveTokenData(response, function () {
+
+            callback && callback(response.access_token);
+          });
+        }
       });
-    }
+    });
   });
 }
 
@@ -114,15 +116,25 @@ function login () {
 
   var state = ''+ Math.random();
 
-  chrome.identity.launchWebAuthFlow({
-    'url': getAuthURL(state),
-    'interactive': true
-  }, function (redirectURL) {
+  storage.set({
+    'backgroundState': 'loggingIn'
+  }, function () {
 
-    var params = getParams(redirectURL);
-    if (params.state === state && params.code) {
-      exchangeCode(params.code);
-    }
+    chrome.identity.launchWebAuthFlow({
+      'url': getAuthURL(state),
+      'interactive': true
+    }, function (redirectURL) {
+
+      storage.set({
+        'backgroundState': undefined
+      }, function () {
+
+        var params = getParams(redirectURL);
+        if (params.state === state && params.code) {
+          exchangeCode(params.code);
+        }
+      });
+    });
   });
 }
 
@@ -140,16 +152,15 @@ function logout () {
   });
 }
 
-function fetchToken (callback) {
+function fetchData (callback) {
 
   storage.get([
     'accessToken',
-    'refreshToken',
-    'expiration'
+    'exchangingCode'
   ], function (data) {
 
     accessToken = data.accessToken;
-    callback(accessToken);
+    callback(data);
   });
 }
 
@@ -169,11 +180,10 @@ function fetchTask (callback) {
         callback(taskData);
       })
       .fail(function (resp, code) {
-        console.log(errrr)
+        console.error(resp, code);
       });
   });
 }
-
 
 function getService (service) {
 
