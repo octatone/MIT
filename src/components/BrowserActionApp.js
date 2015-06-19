@@ -47,6 +47,9 @@ var BrowserActionApp = React.createClass({
       else if ('backgroundState' in changes) {
         self.onChangeBackgroundState(changes.backgroundState.newValue);
       }
+      else if ('domainTimes' in changes) {
+        self.onChangeDomainTimes(changes.domainTimes.newValue);
+      }
     });
   },
 
@@ -66,6 +69,13 @@ var BrowserActionApp = React.createClass({
 
     this.setProps({
       'backgroundState': backgroundState
+    });
+  },
+
+  'onChangeDomainTimes': function (domainTimes) {
+
+    this.setProps({
+      'domainTimes': domainTimes
     });
   },
 
