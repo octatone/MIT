@@ -72,7 +72,11 @@ function updateTimer (url, callback) {
       'notificationTimes': notificationTimes
     });
 
-    if (currentSeconds >= threshold) {
+    // these need methods
+    var hasTask = true;
+    var notCompleted = true;
+
+    if (currentSeconds >= threshold && hasTask && notCompleted) {
       fetchTask(function (task) {
         createNotification({
           'url': url,
