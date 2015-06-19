@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var classNames = require('classnames');
+var pad = require('pad');
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 
@@ -16,6 +17,11 @@ var _naughtyDomains = [
 var _naughtyPattern = new RegExp(_naughtyDomains.join('|'), 'i');
 
 var Stats = React.createClass({
+
+  'padTime': function (str) {
+
+    return pad(2, str, '0');
+  },
 
   'renderStats': function () {
 
@@ -39,8 +45,13 @@ var Stats = React.createClass({
           });
 
           var seconds = domainTimes[domain];
+          var hours = Math.floor(seconds / 60 / 60);
+          seconds = seconds - (hours * 60 * 60);
           var minutes = Math.floor(seconds / 60);
           seconds = seconds - (minutes * 60);
+
+          minutes = self.padTime(minutes);
+          seconds = self.padTime(seconds);
 
           return (
             <div className="clearfix">
@@ -49,7 +60,9 @@ var Stats = React.createClass({
                   {domain}
                 </span>
               </div>
-              <div className="col col-3 right-align">{minutes}:{seconds}</div>
+              <div className="col col-3 right-align">
+                {hours}:{minutes}:{seconds}
+              </div>
             </div>
           );
         })}
