@@ -62,8 +62,13 @@ var View = React.createClass({
     }
 
     return (
-      <div className="view">
+      <div className="view container">
         {subview}
+        <div className="options">
+          <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
+          <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickSettings}></a>
+          <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
+        </div>
       </div>
     );
   }

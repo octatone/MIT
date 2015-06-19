@@ -42,7 +42,7 @@ var TaskInlineEdit = React.createClass({
     if (self.state.editMode === true) {
       return (
         <span>
-          <input onBlur={self.updateValue} defaultValue={props.title}/>
+          <input onBlur={self.updateValue} defaultValue={props.title} className="editMode gray"/>
         </span>
       );
     }

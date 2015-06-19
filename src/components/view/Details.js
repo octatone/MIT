@@ -5,6 +5,8 @@ var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = require('./TaskInlineEdit');
 var classNames = require('classnames');
+var actions = require('../../actions/appActions');
+var moment = require('moment');
 
 var Details = React.createClass({
 
@@ -33,6 +35,9 @@ var Details = React.createClass({
         self.state.subTasks.map(function (subtask) {
           self.toggleSubtask(subtask, true);
         });
+
+        background.resetTimers();
+        actions.setTaskID('');
       });
     });
   },
@@ -99,6 +104,19 @@ var Details = React.createClass({
     }
   },
 
+  'getTimeString': function () {
+
+    return actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        var daysLeft = '';
+
+        return 'You have 3 days and 4 hours to get your task done.'
+      }
+    });
+  },
+
   'getInitialState': function () {
 
     return {
@@ -114,7 +132,7 @@ var Details = React.createClass({
     var classList = self.taskStyles(task);
 
     return (
-      <div className="details container">
+      <div className="details">
         <div className="header details">
           <span className="pictogram-icon wundercon icon-inbox"></span>
           <h2>You have 3 days and 4 hours to get your task done.</h2>
@@ -124,12 +142,6 @@ var Details = React.createClass({
           <ul className="subtasks list-reset">
             {renderedSubtasks}
           </ul>
-
-          <div className="options">
-            <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
-            <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickSettings}></a>
-            <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
-          </div>
         </div>
       </div>
     );

@@ -26125,6 +26125,8 @@ var BrowserActionApp = React.createClass({
         self.onChangeAccessToken(changes.accessToken.newValue);
       } else if ("backgroundState" in changes) {
         self.onChangeBackgroundState(changes.backgroundState.newValue);
+      } else if ("domainTimes" in changes) {
+        self.onChangeDomainTimes(changes.domainTimes.newValue);
       }
     });
   },
@@ -26145,6 +26147,13 @@ var BrowserActionApp = React.createClass({
 
     this.setProps({
       backgroundState: backgroundState
+    });
+  },
+
+  onChangeDomainTimes: function onChangeDomainTimes(domainTimes) {
+
+    this.setProps({
+      domainTimes: domainTimes
     });
   },
 
@@ -27149,6 +27158,8 @@ var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
 var TaskInlineEdit = require("./TaskInlineEdit");
 var classNames = require("classnames");
+var actions = require("../../actions/appActions");
+var moment = require("moment");
 
 var Details = React.createClass({
   displayName: "Details",
@@ -27172,6 +27183,9 @@ var Details = React.createClass({
         self.state.subTasks.map(function (subtask) {
           self.toggleSubtask(subtask, true);
         });
+
+        background.resetTimers();
+        actions.setTaskID("");
       });
     });
   },
@@ -27237,6 +27251,19 @@ var Details = React.createClass({
     }
   },
 
+  getTimeString: function getTimeString() {
+
+    return actions.fetchReminderForTask(taskID).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        var date = moment(reminder.date);
+        var daysLeft = "";
+
+        return "You have 3 days and 4 hours to get your task done.";
+      }
+    });
+  },
+
   getInitialState: function getInitialState() {
 
     return {
@@ -27253,7 +27280,7 @@ var Details = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "details container" },
+      { className: "details" },
       React.createElement(
         "div",
         { className: "header details" },
@@ -27272,13 +27299,6 @@ var Details = React.createClass({
           "ul",
           { className: "subtasks list-reset" },
           renderedSubtasks
-        ),
-        React.createElement(
-          "div",
-          { className: "options" },
-          React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickSettings }),
-          React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
         )
       )
     );
@@ -27288,7 +27308,7 @@ var Details = React.createClass({
 module.exports = Details;
 
 
-},{"./TaskInlineEdit":190,"classnames":1,"react/addons":8}],188:[function(require,module,exports){
+},{"../../actions/appActions":180,"./TaskInlineEdit":190,"classnames":1,"moment":7,"react/addons":8}],188:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -27315,18 +27335,89 @@ module.exports = Options;
 "use strict";
 
 var React = require("react/addons");
+var classNames = require("classnames");
 var chrome = window.chrome;
 var background = chrome.extension.getBackgroundPage();
+
+var _naughtyDomains = ["reddit.com", "facebook.com", "slashdot.org", "news.ycombinator.com", "9gag.com"];
+
+var _naughtyPattern = new RegExp(_naughtyDomains.join("|"), "i");
 
 var Stats = React.createClass({
   displayName: "Stats",
 
-  render: function render() {
+  renderStats: function renderStats() {
+
+    var self = this;
+    var domainTimes = self.props.domainTimes || {};
+
+    var domains = Object.keys(domainTimes);
+    domains.sort(function (a, b) {
+
+      return domainTimes[a] < domainTimes[b];
+    });
 
     return React.createElement(
       "div",
-      { className: "stats container" },
-      "hi"
+      null,
+      domains.map(function (domain) {
+
+        var isNaughty = _naughtyPattern.test(domain || "");
+        var domainClasses = classNames({
+          red: isNaughty,
+          bold: isNaughty
+        });
+
+        var seconds = domainTimes[domain];
+        var minutes = Math.floor(seconds / 60);
+        seconds = seconds - minutes * 60;
+
+        return React.createElement(
+          "div",
+          { className: "clearfix" },
+          React.createElement(
+            "div",
+            { className: "col col-9 overflow-hidden" },
+            React.createElement(
+              "span",
+              { className: domainClasses },
+              domain
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "col col-3 right-align" },
+            minutes,
+            ":",
+            seconds
+          )
+        );
+      })
+    );
+  },
+
+  render: function render() {
+
+    var stats = this.renderStats();
+
+    return React.createElement(
+      "div",
+      { className: "stats" },
+      React.createElement(
+        "div",
+        { className: "header bg-red" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-background" }),
+        React.createElement(
+          "h2",
+          null,
+          "Where you spend your time online ..."
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        stats
+      )
     );
   }
 });
@@ -27334,7 +27425,7 @@ var Stats = React.createClass({
 module.exports = Stats;
 
 
-},{"react/addons":8}],190:[function(require,module,exports){
+},{"classnames":1,"react/addons":8}],190:[function(require,module,exports){
 "use strict";
 
 var React = require("react/addons");
@@ -27381,7 +27472,7 @@ var TaskInlineEdit = React.createClass({
       return React.createElement(
         "span",
         null,
-        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title })
+        React.createElement("input", { onBlur: self.updateValue, defaultValue: props.title, className: "editMode gray" })
       );
     } else {
       return React.createElement(
@@ -27470,8 +27561,15 @@ var View = React.createClass({
 
     return React.createElement(
       "div",
-      { className: "view" },
-      subview
+      { className: "view container" },
+      subview,
+      React.createElement(
+        "div",
+        { className: "options" },
+        React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
+        React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickSettings }),
+        React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
+      )
     );
   }
 });
@@ -27498,7 +27596,8 @@ function renderApp(lists, task, storageData) {
     lists: lists || [],
     task: task,
     loggedIn: !!storageData.accessToken,
-    "backgroundState: ": storageData.backgroundState
+    "backgroundState: ": storageData.backgroundState,
+    domainTimes: storageData.domainTimes
   });
 
   React.render(browserActionApp, mountNode);
