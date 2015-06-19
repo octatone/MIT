@@ -383,6 +383,12 @@ function createNotification (data) {
   }
 }
 
+function resetTimers () {
+  chrome.storage.local.set({
+    'notificationTimes': {}
+  });
+}
+
 function updateBadge (unreadCount) {
 
   chrome.browserAction.setBadgeText({

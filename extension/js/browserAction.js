@@ -27183,6 +27183,9 @@ var Details = React.createClass({
         self.state.subTasks.map(function (subtask) {
           self.toggleSubtask(subtask, true);
         });
+
+        background.resetTimers();
+        actions.setTaskID("");
       });
     });
   },
