@@ -50,7 +50,7 @@ function extractDomain (url) {
   return a.hostname;
 }
 
-function getCurrentSeconds (url, callback) {
+function updateTimer (url, callback) {
 
   var local = chrome.storage.local;
   local.get('domainTimes', function (data) {
@@ -60,6 +60,16 @@ function getCurrentSeconds (url, callback) {
     domainTimes[url] = currentSeconds;
     local.set({
       'domainTimes': domainTimes
+    });
+  });
+
+  local.get('notificationTimes', function (data) {
+    var notificationTimes = data.notificationTimes || {};
+    var currentSeconds = notificationTimes[url];
+    currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
+    notificationTimes[url] = currentSeconds;
+    local.set({
+      'notificationTimes': notificationTimes
     });
 
     if (currentSeconds >= threshold) {
@@ -82,7 +92,7 @@ function updateActiveTabDurations () {
       var url = extractDomain(tabData.url);
       currentURL = url;
       currentTabId = tabId;
-      getCurrentSeconds(currentURL);
+      updateTimer(currentURL);
     });
   });
 
@@ -93,7 +103,7 @@ function updateActiveTabDurations () {
     });
   }
 
-  getCurrentSeconds(currentURL);
+  updateTimer(currentURL);
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, changed) {
@@ -358,11 +368,11 @@ function createNotification (data) {
     );
 
     chrome.notifications.onClosed.addListener(function (notificationId) {
-      chrome.storage.local.get('domainTimes', function (data) {
-        var domainTimes = data.domainTimes;
-        domainTimes[notificationId] = 0;
+      chrome.storage.local.get('notificationTimes', function (data) {
+        var notificationTimes = data.notificationTimes;
+        notificationTimes[notificationId] = 0;
         chrome.storage.local.set({
-          'domainTimes': domainTimes
+          'notificationTimes': notificationTimes
         });
       });
     });
