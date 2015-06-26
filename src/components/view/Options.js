@@ -26,7 +26,8 @@ var Options = React.createClass({
   'getInitialState': function () {
 
     return {
-      'sites':[]
+      'sites':[],
+      'siteValue':''
     };
   },
 
@@ -35,13 +36,24 @@ var Options = React.createClass({
     var self = this;
     background.addSite(site, function (sites) {
       self.setState({'sites': sites});
+
     });
   },
 
-  'onInputChange': function (e) {
+  'onInputKeydown': function (e) {
+
+    var self = this;
+    var value = e.target.value;
+
     if (e.which === 13) {
-      this.addSite(e.target.value);
+      self.addSite(value);
+      self.setState({'siteValue': ''});
     }
+  },
+
+  'onInputChange': function (e) {
+
+    this.setState({'siteValue': e.target.value});
   },
 
   'componentDidMount': function () {
@@ -59,13 +71,15 @@ var Options = React.createClass({
           <span className="pictogram-icon wundercon icon-settings"></span>
           <h2>Customize what sites you should stay away from</h2>
         </div>
-        <div className="content-wrapper">
+        <div className="content-wrapper extend">
           <input
               ref="addSite"
               className="block fit-width field-light px1"
               placeholder="Add a new site to your blacklist"
-              onKeyDown={self.onInputChange}/>
-          <ul>
+              value={self.state.siteValue}
+              onKeyDown={self.onInputKeydown}
+              onChange={self.onInputChange} />
+          <ul className="list-reset blacklist">
             {sites}
           </ul>
         </div>

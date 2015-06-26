@@ -27342,7 +27342,8 @@ var Options = React.createClass({
   getInitialState: function getInitialState() {
 
     return {
-      sites: []
+      sites: [],
+      siteValue: ""
     };
   },
 
@@ -27354,10 +27355,20 @@ var Options = React.createClass({
     });
   },
 
-  onInputChange: function onInputChange(e) {
+  onInputKeydown: function onInputKeydown(e) {
+
+    var self = this;
+    var value = e.target.value;
+
     if (e.which === 13) {
-      this.addSite(e.target.value);
+      self.addSite(value);
+      self.setState({ siteValue: "" });
     }
+  },
+
+  onInputChange: function onInputChange(e) {
+
+    this.setState({ siteValue: e.target.value });
   },
 
   componentDidMount: function componentDidMount() {
@@ -27384,15 +27395,17 @@ var Options = React.createClass({
       ),
       React.createElement(
         "div",
-        { className: "content-wrapper" },
+        { className: "content-wrapper extend" },
         React.createElement("input", {
           ref: "addSite",
           className: "block fit-width field-light px1",
           placeholder: "Add a new site to your blacklist",
-          onKeyDown: self.onInputChange }),
+          value: self.state.siteValue,
+          onKeyDown: self.onInputKeydown,
+          onChange: self.onInputChange }),
         React.createElement(
           "ul",
-          null,
+          { className: "list-reset blacklist" },
           sites
         )
       )

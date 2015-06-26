@@ -109,6 +109,10 @@ body {
   border-right:1px solid #ccc;
 }
 
+.content-wrapper.extend {
+  padding-top: 50px
+}
+
 .subheading {
   font-size: 14px;
   color: rgb(84, 84, 84);
@@ -295,6 +299,10 @@ button.bg-blue.next {
   display: inline-block;
   margin-top: 4px;
   cursor: pointer;
+}
+
+.blacklist li{
+  margin-left:10px;
 }
 
 .options {
