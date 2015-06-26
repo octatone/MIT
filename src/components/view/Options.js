@@ -19,7 +19,7 @@ var Options = React.createClass({
     var self = this;
     var sites = self.state.sites;
     return sites.map(function (site) {
-      return <li>{site}</li>;
+      return <li className="clearfix blacklist-item">{site} <a className="right pictogram-icon wundercon icon-x-active delete-icon light-gray" onClick={self.deleteSite.bind(self, site)}></a></li>;
     });
   },
 
@@ -36,7 +36,15 @@ var Options = React.createClass({
     var self = this;
     background.addSite(site, function (sites) {
       self.setState({'sites': sites});
+    });
+  },
 
+  'deleteSite': function (site) {
+
+    var self = this;
+    console.log(site, 'delete called')
+    background.removeSite(site, function (sites) {
+      self.setState({'sites': sites});
     });
   },
 

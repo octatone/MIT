@@ -175,7 +175,7 @@ select {
   line-height: 30px;
 }
 
-.num-list:hover .delete-icon {
+.num-list:hover .delete-icon, .blacklist-item:hover .delete-icon  {
   display: block;
 }
 
@@ -303,6 +303,7 @@ button.bg-blue.next {
 
 .blacklist li{
   margin-left:10px;
+  min-height: 33px;
 }
 
 .options {

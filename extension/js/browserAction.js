@@ -27333,8 +27333,10 @@ var Options = React.createClass({
     return sites.map(function (site) {
       return React.createElement(
         "li",
-        null,
-        site
+        { className: "clearfix blacklist-item" },
+        site,
+        " ",
+        React.createElement("a", { className: "right pictogram-icon wundercon icon-x-active delete-icon light-gray", onClick: self.deleteSite.bind(self, site) })
       );
     });
   },
@@ -27351,6 +27353,15 @@ var Options = React.createClass({
 
     var self = this;
     background.addSite(site, function (sites) {
+      self.setState({ sites: sites });
+    });
+  },
+
+  deleteSite: function deleteSite(site) {
+
+    var self = this;
+    console.log(site, "delete called");
+    background.removeSite(site, function (sites) {
       self.setState({ sites: sites });
     });
   },
