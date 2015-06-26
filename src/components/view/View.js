@@ -24,7 +24,7 @@ var View = React.createClass({
     });
   },
 
-  'onClickOptions': function () {
+  'onClickSettings': function () {
 
     this.setState({
       'subview': 'options'

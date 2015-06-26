@@ -27582,7 +27582,7 @@ var Stats = React.createClass({
       ),
       React.createElement(
         "div",
-        { className: "content-wrapper" },
+        { className: "content-wrapper extend" },
         stats
       )
     );
@@ -27689,7 +27689,7 @@ var View = React.createClass({
     });
   },
 
-  onClickOptions: function onClickOptions() {
+  onClickSettings: function onClickSettings() {
 
     this.setState({
       subview: "options"

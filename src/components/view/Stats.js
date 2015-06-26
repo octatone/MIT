@@ -82,7 +82,7 @@ var Stats = React.createClass({
           <span className="pictogram-icon wundercon icon-background"></span>
           <h2>Where you spend your time online ...</h2>
         </div>
-        <div className="content-wrapper">
+        <div className="content-wrapper extend">
           {stats}
         </div>
       </div>
