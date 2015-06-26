@@ -15,8 +15,8 @@ var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 var storage = chrome.storage.sync;
 var localStorage = chrome.storage.local;
 var timeout = 30 * 1000;
-// CONFIGURE THIS!!!
-var threshold = 10;
+// TIMER FOR NOTIFICATIONS: CONFIGURE THIS!!!
+var threshold = 60 * 30;
 
 var notifiedIds = {};
 var currentNotifications = [];
@@ -50,7 +50,7 @@ function extractDomain (url) {
   return a.hostname;
 }
 
-function updateTimer (url, callback) {
+function updateTimer (url, onBlacklistSite) {
 
   var local = chrome.storage.local;
   local.get('domainTimes', function (data) {
@@ -63,29 +63,46 @@ function updateTimer (url, callback) {
     });
   });
 
-  local.get('notificationTimes', function (data) {
-    var notificationTimes = data.notificationTimes || {};
-    var currentSeconds = notificationTimes[url];
-    currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
-    notificationTimes[url] = currentSeconds;
-    local.set({
-      'notificationTimes': notificationTimes
+  if (onBlacklistSite) {
+    local.get('notificationTimes', function (data) {
+      var notificationTimes = data.notificationTimes || {};
+      var currentSeconds = notificationTimes[url];
+      currentSeconds = currentSeconds !== undefined ? currentSeconds + 1 : 0;
+      notificationTimes[url] = currentSeconds;
+      local.set({
+        'notificationTimes': notificationTimes
+      });
+
+      // these need methods
+      var hasTask = true;
+      var notCompleted = true;
+
+      if (currentSeconds >= threshold && hasTask && notCompleted) {
+        fetchTask(function (task) {
+          createNotification({
+            'url': url,
+            'id': task.id,
+            'title': task.title,
+            'body': 'You should probably get off of ' + url + ' and get back to ' + task.title
+          });
+        })
+      }
     });
+  }
+}
 
-    // these need methods
-    var hasTask = true;
-    var notCompleted = true;
+function checkIfSiteIsBlacklisted () {
 
-    if (currentSeconds >= threshold && hasTask && notCompleted) {
-      fetchTask(function (task) {
-        createNotification({
-          'url': url,
-          'id': task.id,
-          'title': task.title,
-          'body': 'You should probably get off of ' + url + ' and get back to ' + task.title
-        });
-      })
-    }
+  fetchSites(function (sites) {
+    sites.forEach(function (site) {
+      var exp = new RegExp('\\b' + site + '\\b');
+      if (exp.test(currentURL)) {
+        updateTimer(currentURL, true);
+      }
+      else {
+        updateTimer(currentURL);
+      }
+    });
   });
 }
 
@@ -96,7 +113,6 @@ function updateActiveTabDurations () {
       var url = extractDomain(tabData.url);
       currentURL = url;
       currentTabId = tabId;
-      updateTimer(currentURL);
     });
   });
 
@@ -107,12 +123,13 @@ function updateActiveTabDurations () {
     });
   }
 
-  updateTimer(currentURL);
+  checkIfSiteIsBlacklisted();
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, changed) {
   if (changed.url && currentTabId === tabId) {
     currentURL = changed.url;
+    checkIfSiteIsBlacklisted();
   }
 });
 
@@ -353,6 +370,40 @@ function fetchSubtasks (taskID) {
 
   return getService('subtasks').forTask(taskID);
 }
+
+function isObjEmpty (obj) {
+  return Object.keys(obj).length === 0;
+}
+
+function fetchSites (callback) {
+
+  chrome.storage.sync.get(['sites'], function (sites) {
+    sites = isObjEmpty(sites) ? []: sites.sites;
+    callback(sites);
+  })
+}
+
+function addSite (site, callback) {
+  fetchSites(function (sites) {
+    sites = isObjEmpty(sites) ? []: sites;
+    sites.push(site);
+    chrome.storage.sync.set({'sites': sites}, function () {
+      callback(sites);
+    });
+  });
+}
+
+function removeSite (site, callback) {
+  fetchSites(function (sites) {
+    sites = isObjEmpty(sites) ? []: sites;
+    var sitePosition = sites.indexOf(site);
+    sites.splice(sitePosition, 1);
+    chrome.storage.sync.set({'sites': sites}, function () {
+      callback(sites);
+    });
+  });
+}
+
 
 function createNotification (data) {
 

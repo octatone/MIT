@@ -58,6 +58,10 @@ body {
   color: #65B01B;
 }
 
+.header .icon-settings {
+  color: #65B01B;
+}
+
 .header span.wundercon {
   position: absolute;
   z-index: 5;
@@ -103,6 +107,10 @@ body {
   padding: 1em;
   border-left:1px solid #ccc;
   border-right:1px solid #ccc;
+}
+
+.content-wrapper.extend {
+  padding-top: 50px
 }
 
 .subheading {
@@ -167,7 +175,7 @@ select {
   line-height: 30px;
 }
 
-.num-list:hover .delete-icon {
+.num-list:hover .delete-icon, .blacklist-item:hover .delete-icon  {
   display: block;
 }
 
@@ -291,6 +299,11 @@ button.bg-blue.next {
   display: inline-block;
   margin-top: 4px;
   cursor: pointer;
+}
+
+.blacklist li{
+  margin-left:10px;
+  min-height: 33px;
 }
 
 .options {
