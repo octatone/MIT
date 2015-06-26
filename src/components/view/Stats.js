@@ -31,7 +31,9 @@ var Stats = React.createClass({
     var domains = Object.keys(domainTimes);
     domains.sort(function (a, b) {
 
-      return domainTimes[a] < domainTimes[b];
+      var timeA = domainTimes[a];
+      var timeB = domainTimes[b];
+      return timeA < timeB ? 1 : timeA > timeB ? -1 : 0;
     });
 
     return (
@@ -55,7 +57,7 @@ var Stats = React.createClass({
 
           return (
             <div className="clearfix">
-              <div className="col col-9 overflow-hidden">
+              <div className="col col-9 overflow-hidden nowrap ellipses">
                 <span className={domainClasses}>
                   {domain}
                 </span>

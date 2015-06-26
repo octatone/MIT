@@ -27204,12 +27204,6 @@ var Details = React.createClass({
     return "";
   },
 
-  onClickStats: function onClickStats() {},
-
-  onClickSettings: function onClickSettings() {},
-
-  onClickHelp: function onClickHelp() {},
-
   completeMainTask: function completeMainTask() {
 
     var self = this;
@@ -27247,16 +27241,6 @@ var Details = React.createClass({
     background.updateSubtask(subtask, { completed: shouldComplete }).always(self.fetchSubtasks, self);
   },
 
-  fetchSubtasks: function fetchSubtasks() {
-
-    var self = this;
-    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
-      subTasks = subTasks || [];
-      self.setState({
-        subTasks: subTasks });
-    });
-  },
-
   taskStyles: function taskStyles(task) {
 
     return classNames("pictogram-icon", "wundercon", "gray", "mr1", {
@@ -27278,32 +27262,66 @@ var Details = React.createClass({
     });
   },
 
+  renderReminderTime: function renderReminderTime() {
+
+    var self = this;
+    var reminderTime = self.state.reminderTime;
+    var str = "Fetching task info ...";
+
+    if (reminderTime) {
+      var now = moment();
+      var reminder = moment(reminderTime);
+      var difference = reminder.diff(now);
+      var duration = moment.duration(difference);
+
+      if (difference >= 0) {
+        str = "You have " + duration.humanize() + " to get your task done.";
+      } else {
+        str = "Your task was due " + duration.humanize(true);
+      }
+    }
+
+    return str;
+  },
+
+  fetchSubtasks: function fetchSubtasks() {
+
+    var self = this;
+    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
+      subTasks = subTasks || [];
+      self.setState({
+        subTasks: subTasks });
+    });
+  },
+
+  fetchReminderTime: function fetchReminderTime() {
+
+    var self = this;
+    actions.fetchReminderForTask(self.props.task.id).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        self.setState({
+          reminderTime: reminder.date
+        });
+      }
+    });
+  },
+
   componentDidMount: function componentDidMount() {
 
     var self = this;
     var task = self.props.task;
     if (task) {
       self.fetchSubtasks();
+      self.fetchReminderTime();
     }
-  },
-
-  getTimeString: function getTimeString() {
-
-    return actions.fetchReminderForTask(taskID).done(function (reminder) {
-
-      if (reminder && reminder.date) {
-        var date = moment(reminder.date);
-        var daysLeft = "";
-
-        return "You have 3 days and 4 hours to get your task done.";
-      }
-    });
   },
 
   getInitialState: function getInitialState() {
 
     return {
-      subTasks: []
+      subTasks: [],
+      reminderTime: undefined
     };
   },
 
@@ -27313,6 +27331,8 @@ var Details = React.createClass({
     var task = self.props.task;
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
     var classList = self.taskStyles(task);
+
+    var reminderString = self.renderReminderTime();
 
     return React.createElement(
       "div",
@@ -27324,7 +27344,7 @@ var Details = React.createClass({
         React.createElement(
           "h2",
           null,
-          "You have 3 days and 4 hours to get your task done."
+          reminderString
         )
       ),
       React.createElement(
@@ -27354,108 +27374,12 @@ var background = chrome.extension.getBackgroundPage();
 var Options = React.createClass({
   displayName: "Options",
 
-  fetchSites: function fetchSites() {
-
-    var self = this;
-    background.fetchSites(function (sites) {
-      self.setState({ sites: sites || [] });
-    });
-  },
-
-  renderSites: function renderSites() {
-
-    var self = this;
-    var sites = self.state.sites;
-    return sites.map(function (site) {
-      return React.createElement(
-        "li",
-        { className: "clearfix blacklist-item" },
-        site,
-        " ",
-        React.createElement("a", { className: "right pictogram-icon wundercon icon-x-active delete-icon light-gray", onClick: self.deleteSite.bind(self, site) })
-      );
-    });
-  },
-
-  getInitialState: function getInitialState() {
-
-    return {
-      sites: [],
-      siteValue: ""
-    };
-  },
-
-  addSite: function addSite(site) {
-
-    var self = this;
-    background.addSite(site, function (sites) {
-      self.setState({ sites: sites });
-    });
-  },
-
-  deleteSite: function deleteSite(site) {
-
-    var self = this;
-    console.log(site, "delete called");
-    background.removeSite(site, function (sites) {
-      self.setState({ sites: sites });
-    });
-  },
-
-  onInputKeydown: function onInputKeydown(e) {
-
-    var self = this;
-    var value = e.target.value;
-
-    if (e.which === 13) {
-      self.addSite(value);
-      self.setState({ siteValue: "" });
-    }
-  },
-
-  onInputChange: function onInputChange(e) {
-
-    this.setState({ siteValue: e.target.value });
-  },
-
-  componentDidMount: function componentDidMount() {
-    this.fetchSites();
-  },
-
   render: function render() {
-
-    var self = this;
-    var sites = self.renderSites();
 
     return React.createElement(
       "div",
-      { className: "settings" },
-      React.createElement(
-        "div",
-        { className: "header bg-green" },
-        React.createElement("span", { className: "pictogram-icon wundercon icon-settings" }),
-        React.createElement(
-          "h2",
-          null,
-          "Customize what sites you should stay away from"
-        )
-      ),
-      React.createElement(
-        "div",
-        { className: "content-wrapper extend" },
-        React.createElement("input", {
-          ref: "addSite",
-          className: "block fit-width field-light px1",
-          placeholder: "Add a new site to your blacklist",
-          value: self.state.siteValue,
-          onKeyDown: self.onInputKeydown,
-          onChange: self.onInputChange }),
-        React.createElement(
-          "ul",
-          { className: "list-reset blacklist" },
-          sites
-        )
-      )
+      { className: "options container" },
+      "hi"
     );
   }
 });
@@ -27492,7 +27416,9 @@ var Stats = React.createClass({
     var domains = Object.keys(domainTimes);
     domains.sort(function (a, b) {
 
-      return domainTimes[a] < domainTimes[b];
+      var timeA = domainTimes[a];
+      var timeB = domainTimes[b];
+      return timeA < timeB ? 1 : timeA > timeB ? -1 : 0;
     });
 
     return React.createElement(
@@ -27520,7 +27446,7 @@ var Stats = React.createClass({
           { className: "clearfix" },
           React.createElement(
             "div",
-            { className: "col col-9 overflow-hidden" },
+            { className: "col col-9 overflow-hidden nowrap ellipses" },
             React.createElement(
               "span",
               { className: domainClasses },
@@ -27653,6 +27579,13 @@ var background = chrome.extension.getBackgroundPage();
 var View = React.createClass({
   displayName: "View",
 
+  onClickDetails: function onClickDetails() {
+
+    this.setState({
+      subview: "details"
+    });
+  },
+
   onClickBack: function onClickBack() {
 
     this.setState({
@@ -27700,6 +27633,7 @@ var View = React.createClass({
       case "stats":
         subview = React.createElement(Stats, _extends({}, props, { onBack: self.onClickBack }));
         break;
+      case "details":
       default:
         subview = React.createElement(Details, _extends({}, props, { onUpdateTask: self.setTask }));
     }
@@ -27711,9 +27645,15 @@ var View = React.createClass({
       React.createElement(
         "div",
         { className: "options" },
-        React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
-        React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickOptions }),
-        React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
+        React.createElement("a", {
+          className: "pictogram-icon wundercon icon-list gray col col-4 bottom-options",
+          onClick: self.onClickDetails }),
+        React.createElement("a", {
+          className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options",
+          onClick: self.onClickStats }),
+        React.createElement("a", {
+          className: "pictogram-icon wundercon icon-settings gray col col-4 bottom-options last",
+          onClick: self.onClickSettings })
       )
     );
   }
