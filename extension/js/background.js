@@ -15,8 +15,8 @@ var exchangeProxy = 'https://mit-wunderlist-exchange.herokuapp.com';
 var storage = chrome.storage.sync;
 var localStorage = chrome.storage.local;
 var timeout = 30 * 1000;
-// CONFIGURE THIS!!!
-var threshold = 10;
+// TIMER FOR NOTIFICATIONS: CONFIGURE THIS!!!
+var threshold = (60 * 1000) * 30;
 
 var notifiedIds = {};
 var currentNotifications = [];
@@ -352,6 +352,29 @@ function updateSubtask (subtask, data) {
 function fetchSubtasks (taskID) {
 
   return getService('subtasks').forTask(taskID);
+}
+
+function isObjEmpty (obj) {
+  return Object.keys(obj).length === 0;
+}
+
+function fetchSites (callback) {
+
+  chrome.storage.sync.get(['sites'], function (sites) {
+    sites = isObjEmpty(sites) ? []: sites.sites;
+    callback(sites);
+  })
+}
+
+function addSite (site, callback) {
+  fetchSites(function (sites) {
+    sites = isObjEmpty(sites) ? []: sites;
+    console.log(sites)
+    sites.push(site);
+    chrome.storage.sync.set({'sites': sites}, function () {
+      callback(sites);
+    });
+  });
 }
 
 function createNotification (data) {

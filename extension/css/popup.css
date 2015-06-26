@@ -58,6 +58,10 @@ body {
   color: #65B01B;
 }
 
+.header .icon-settings {
+  color: #65B01B;
+}
+
 .header span.wundercon {
   position: absolute;
   z-index: 5;

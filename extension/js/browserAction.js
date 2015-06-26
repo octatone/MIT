@@ -27318,12 +27318,84 @@ var background = chrome.extension.getBackgroundPage();
 var Options = React.createClass({
   displayName: "Options",
 
+  fetchSites: function fetchSites() {
+
+    var self = this;
+    background.fetchSites(function (sites) {
+      self.setState({ sites: sites || [] });
+    });
+  },
+
+  renderSites: function renderSites() {
+
+    var self = this;
+    var sites = self.state.sites;
+    return sites.map(function (site) {
+      return React.createElement(
+        "li",
+        null,
+        site
+      );
+    });
+  },
+
+  getInitialState: function getInitialState() {
+
+    return {
+      sites: []
+    };
+  },
+
+  addSite: function addSite(site) {
+
+    var self = this;
+    background.addSite(site, function (sites) {
+      self.setState({ sites: sites });
+    });
+  },
+
+  onInputChange: function onInputChange(e) {
+    if (e.which === 13) {
+      this.addSite(e.target.value);
+    }
+  },
+
+  componentDidMount: function componentDidMount() {
+    this.fetchSites();
+  },
+
   render: function render() {
+
+    var self = this;
+    var sites = self.renderSites();
 
     return React.createElement(
       "div",
-      { className: "options container" },
-      "hi"
+      { className: "settings" },
+      React.createElement(
+        "div",
+        { className: "header bg-green" },
+        React.createElement("span", { className: "pictogram-icon wundercon icon-settings" }),
+        React.createElement(
+          "h2",
+          null,
+          "Customize what sites you should stay away from"
+        )
+      ),
+      React.createElement(
+        "div",
+        { className: "content-wrapper" },
+        React.createElement("input", {
+          ref: "addSite",
+          className: "block fit-width field-light px1",
+          placeholder: "Add a new site to your blacklist",
+          onKeyDown: self.onInputChange }),
+        React.createElement(
+          "ul",
+          null,
+          sites
+        )
+      )
     );
   }
 });
@@ -27567,7 +27639,7 @@ var View = React.createClass({
         "div",
         { className: "options" },
         React.createElement("a", { className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options", onClick: self.onClickStats }),
-        React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickSettings }),
+        React.createElement("a", { className: "pictogram-icon wundercon icon-settings gray  col col-4 bottom-options", onClick: self.onClickOptions }),
         React.createElement("a", { className: "pictogram-icon wundercon icon-support gray col col-4 bottom-options last", onClick: self.onClickHelp })
       )
     );
