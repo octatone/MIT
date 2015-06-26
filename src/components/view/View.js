@@ -10,6 +10,13 @@ var background = chrome.extension.getBackgroundPage();
 
 var View = React.createClass({
 
+  'onClickDetails': function () {
+
+    this.setState({
+      'subview': 'details'
+    });
+  },
+
   'onClickBack': function () {
 
     this.setState({
@@ -17,7 +24,7 @@ var View = React.createClass({
     });
   },
 
-  'onClickOptions': function () {
+  'onClickSettings': function () {
 
     this.setState({
       'subview': 'options'
@@ -57,6 +64,7 @@ var View = React.createClass({
       case 'stats':
         subview = <Stats {...props} onBack={self.onClickBack}/>;
         break;
+      case 'details':
       default:
         subview = <Details {...props} onUpdateTask={self.setTask}/>;
     }
@@ -65,9 +73,15 @@ var View = React.createClass({
       <div className="view container">
         {subview}
         <div className="options">
-          <a className="pictogram-icon wundercon icon-background gray col col-4 bottom-options" onClick={self.onClickStats}></a>
-          <a className="pictogram-icon wundercon icon-settings gray  col col-4 bottom-options" onClick={self.onClickOptions}></a>
-          <a className="pictogram-icon wundercon icon-support gray col col-4 bottom-options last" onClick={self.onClickHelp}></a>
+          <a
+            className="pictogram-icon wundercon icon-list gray col col-4 bottom-options"
+            onClick={self.onClickDetails}></a>
+          <a
+            className="pictogram-icon wundercon icon-background gray col col-4 bottom-options"
+            onClick={self.onClickStats}></a>
+          <a
+            className="pictogram-icon wundercon icon-settings gray col col-4 bottom-options last"
+            onClick={self.onClickSettings}></a>
         </div>
       </div>
     );

@@ -14,18 +14,6 @@ var Details = React.createClass({
     return '';
   },
 
-  'onClickStats': function () {
-
-  },
-
-  'onClickSettings': function () {
-
-  },
-
-  'onClickHelp': function () {
-
-  },
-
   'completeMainTask': function () {
 
     var self = this;
@@ -63,17 +51,6 @@ var Details = React.createClass({
     background.updateSubtask(subtask, {'completed':shouldComplete}).always(self.fetchSubtasks, self);
   },
 
-  'fetchSubtasks': function () {
-
-    var self = this;
-    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
-      subTasks = subTasks || [];
-      self.setState({
-        'subTasks': subTasks,
-      });
-    });
-  },
-
   'taskStyles': function (task) {
 
     return classNames(
@@ -95,32 +72,68 @@ var Details = React.createClass({
     });
   },
 
+  'renderReminderTime': function () {
+
+    var self = this;
+    var reminderTime = self.state.reminderTime;
+    var str = 'Fetching task info ...'
+
+    if (reminderTime) {
+      var now = moment();
+      var reminder = moment(reminderTime);
+      var difference = reminder.diff(now);
+      var duration = moment.duration(difference);
+
+      if (difference >= 0) {
+        str = 'You have ' +  duration.humanize() + ' to get your task done.';
+      }
+      else {
+        str = 'Your task was due ' + duration.humanize(true);
+      }
+    }
+
+    return str;
+  },
+
+  'fetchSubtasks': function () {
+
+    var self = this;
+    background.fetchSubtasks(self.props.task.id).always(function (subTasks) {
+      subTasks = subTasks || [];
+      self.setState({
+        'subTasks': subTasks,
+      });
+    });
+  },
+
+  'fetchReminderTime': function () {
+
+    var self = this;
+    actions.fetchReminderForTask(self.props.task.id).done(function (reminder) {
+
+      if (reminder && reminder.date) {
+        self.setState({
+          'reminderTime': reminder.date
+        });
+      }
+    });
+  },
+
   'componentDidMount': function () {
 
     var self = this;
     var task = self.props.task;
     if (task) {
       self.fetchSubtasks();
+      self.fetchReminderTime();
     }
-  },
-
-  'getTimeString': function () {
-
-    return actions.fetchReminderForTask(taskID).done(function (reminder) {
-
-      if (reminder && reminder.date) {
-        var date = moment(reminder.date);
-        var daysLeft = '';
-
-        return 'You have 3 days and 4 hours to get your task done.'
-      }
-    });
   },
 
   'getInitialState': function () {
 
     return {
-      'subTasks': []
+      'subTasks': [],
+      'reminderTime': undefined
     }
   },
 
@@ -131,11 +144,13 @@ var Details = React.createClass({
     var renderedSubtasks = self.state.subTasks && self.renderSubtasks();
     var classList = self.taskStyles(task);
 
+    var reminderString = self.renderReminderTime();
+
     return (
       <div className="details">
         <div className="header details">
           <span className="pictogram-icon wundercon icon-inbox"></span>
-          <h2>You have 3 days and 4 hours to get your task done.</h2>
+          <h2>{reminderString}</h2>
         </div>
         <div className="content-wrapper">
           <TaskInlineEdit className={classList} textClasses="main-task mb1 inline-block" onClick={self.completeMainTask} updateValue={self.updateTaskTitle} title={task.title}/>
