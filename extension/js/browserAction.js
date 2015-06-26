@@ -26279,7 +26279,7 @@ var Login = React.createClass({
     var self = this;
     var state = self.state;
 
-    var buttonClasses = classNames("button bg-green white", {
+    var buttonClasses = classNames("button bg-blue white", {
       "display-none": state.state !== undefined
     });
 

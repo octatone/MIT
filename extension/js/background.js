@@ -128,7 +128,7 @@ function updateActiveTabDurations () {
 
 chrome.tabs.onUpdated.addListener(function (tabId, changed) {
   if (changed.url && currentTabId === tabId) {
-    currentURL = changed.url;
+    currentURL = extractDomain(changed.url);
     checkIfSiteIsBlacklisted();
   }
 });

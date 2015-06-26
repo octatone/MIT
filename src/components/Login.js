@@ -40,7 +40,7 @@ var Login = React.createClass({
     var state = self.state;
 
     var buttonClasses = classNames(
-      'button bg-green white',
+      'button bg-blue white',
       {
         'display-none': state.state !== undefined
     });
