@@ -52,15 +52,15 @@ body {
 }
 
 .header .wundercon.icon-star-filled, .header .icon-inbox {
-  color: #2b88d9;
+  color: #4482c1;
 }
 
 .header .wundercon.icon-add {
-  color:#E6B035;
+  color:#6969aa;
 }
 
 .header .icon-reminder {
-  color: #65B01B;
+  color: #a5a4cc;
 }
 
 .header .icon-background {
@@ -68,7 +68,7 @@ body {
 }
 
 .header .icon-settings {
-  color: #65B01B;
+  color: #a5a4cc;
 }
 
 .header span.wundercon {
@@ -99,16 +99,32 @@ body {
   box-shadow: 0px 1px 1px #D5D5D5;
 }
 
+.blue {
+  color:#4482c1;
+}
+
+.yellow {
+  color:#6969aa;
+}
+
+.green {
+  color: #a5a4cc;
+}
+
+.bg-green {
+  background-color: #a5a4cc;
+}
+
 .header.steps {
-  background-color: #E6B035;
+  background-color: #6969aa;
 }
 
 .header.tasks, .header.details {
-  background-color: #2b88d9;
+  background-color: #4482c1;
 }
 
 .header.time {
-  background-color: #65B01B;
+  background-color: #a5a4cc;
 }
 
 .content-wrapper {
@@ -202,7 +218,7 @@ select {
   border-radius: 5px;
   color:#fff;
   line-height: 29px;
-  background-color: #E6B035;
+  background-color: #6969aa;
 }
 
 .delete-icon {

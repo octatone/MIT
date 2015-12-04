@@ -16,7 +16,7 @@ var storage = chrome.storage.sync;
 var localStorage = chrome.storage.local;
 var timeout = 30 * 1000;
 // TIMER FOR NOTIFICATIONS: CONFIGURE THIS!!!
-var threshold = 60 * 30;
+var threshold = 5;
 
 var notifiedIds = {};
 var currentNotifications = [];
