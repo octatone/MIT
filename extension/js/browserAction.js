@@ -27745,7 +27745,7 @@ var View = React.createClass({
           className: "pictogram-icon wundercon icon-list gray col col-4 bottom-options",
           onClick: self.onClickDetails }),
         React.createElement("a", {
-          className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options",
+          className: "pictogram-icon wundercon icon-background gray col col-4 bottom-options hide-dot",
           onClick: self.onClickStats }),
         React.createElement("a", {
           className: "pictogram-icon wundercon icon-settings gray col col-4 bottom-options last",

@@ -297,6 +297,26 @@ function getService (service) {
   });
 }
 
+function sortLists (lists, positions) {
+
+  var sortedLists = [];
+  var positionValues = positions && positions[0].values;
+  positionValues.forEach(function (listId) {
+    var nextPosition = lists.find(function (list) {
+      return list.id === listId;
+    });
+
+    if (nextPosition.list_type === 'inbox') {
+      sortedLists.unshift(nextPosition);
+    }
+    else {
+      sortedLists.push(nextPosition);
+    }
+  });
+
+  return sortedLists;
+}
+
 function fetchLists () {
 
   var deferred = new WBDeferred();
@@ -314,8 +334,8 @@ function fetchLists () {
 
   when(listsRequest, positionsRequest)
     .done(function () {
-
-      deferred.resolve(lists);
+      var sortedLists = sortLists(lists, positions);
+      deferred.resolve(sortedLists);
     });
 
   return deferred.promise();
